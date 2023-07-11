@@ -48,13 +48,23 @@ I decided on using pygame for my game as it will make the development process fa
 
 I looked at other solutions...
 
-Stick fight
+Stick fight:
+
++ Fast paced
++ Easy local multiplayer
++ Some platform destruction
+
+- Not open source
+- Costs money
+- Online multiplayer can be buggy
 
 frog smashers:
++ Also fast paced
++ 
 
 ### **Essential Features**
 
-* Player versus player (pvp) combat is an essensial feature.
+* Player versus player (pvp) combat is an essensial feature. It is important as users want to play against each other.
 
 ### **Limitations**
 
