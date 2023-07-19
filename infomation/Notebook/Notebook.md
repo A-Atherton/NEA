@@ -33,3 +33,43 @@ Here you can see that the object called ball is being drawn to the screen:
 
 It does not move as no forces are acting on it.
 
+I created a class called player which I will use later
+
+![Alt text](<Screenshot 2023-07-19 at 18.03.21.png>)
+
+thinking of doing levels with a level map string after looking at a [video](https://www.youtube.com/watch?v=YWN8GcmJ-jA)
+
+![Alt text](<Screenshot 2023-07-19 at 18.13.54.png>)
+
+
+
+``` python
+
+class Level():
+  def __init__(self, level, level_ID):
+    self.level = level
+    self.level_ID = level_ID
+
+level1 = Level([
+      "      ",
+      "XX  XX",
+      "XXXXXX"
+    ], 23)
+```
+
+will run a function that gets all levels from a file that comes with the game. This can be added or removed from.
+
+when a level is being played the level can be changed by destroying tiles. this will not effect the levels that are stored in the file.
+
+created a class for the level and for the tiles both from the above tutorial video
+
+![Alt text](<Screenshot 2023-07-19 at 19.03.49.png>)
+
+I created a test tile and drew it
+
+![Alt text](<Screenshot 2023-07-19 at 19.12.02.png>)
+![Alt text](<Screenshot 2023-07-19 at 19.12.10.png>)
+
+here is the result
+
+![Alt text](<Screenshot 2023-07-19 at 19.11.44.png>)

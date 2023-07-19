@@ -16,9 +16,35 @@ class RidgidBody():
     def update(self):
         self.velocity += self.acceleration
         self.position += self.velocity
+        if self.position <= 720:
+            self.velocity *= -1
+        #friction
+        
 
 ball = RidgidBody([100,300], 2)
 
+class Player(RidgidBody):
+    def __init__(self, position: list, mass: int) -> None:
+        super().__init__(position, mass)
+        
+class Level():
+    def __init__(self, layout, level_ID):
+        self.layout = layout
+        self.level_ID = level_ID
+        self.tile_size = 64 
+
+    def display(self):
+        for row_index, row in enumerate(self.layout):
+            for col_index, cell in enumerate(row):
+                x = col_index * self.tile_size
+                y = row_index * self.tile_size
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, position, size) -> None:
+        super().__init__()
+        self.image = pygame.Surface((size, size))
+        self.image.fill("grey")
+        self.rect = self.image.get_rect(topleft = position)
 
 #Pygame Setup
 
@@ -26,14 +52,6 @@ pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
-
-#button setup
-
-button = Button(screen,100,100,
-                     60,20,
-                         text="gravity",
-                           onClick=lambda: ball.add_force([0,50*10]))
-
 
 #Main loop
 
@@ -50,12 +68,6 @@ while running:
     #Render
     screen.fill('white')
     
-    button.draw()
-
-    pygame.draw.circle(screen, "black", ball.position, 5)
-
-    #Flip
-
     pygame.display.flip()
 
     clock.tick(60)
