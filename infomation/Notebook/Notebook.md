@@ -73,3 +73,20 @@ I created a test tile and drew it
 here is the result
 
 ![Alt text](<Screenshot 2023-07-19 at 19.11.44.png>)
+
+
+created a method that runs when the object is created
+
+![Alt text](<Screenshot 2023-07-21 at 10.20.31.png>)
+
+It adds a tile to a group of sprites if there is an "X" in the level layout in that position. 
+
+![Alt text](<Screenshot 2023-07-21 at 10.20.43.png>)
+
+Error that amkes no sense - Error was boring missed a parenthesis
+
+![Alt text](<Screenshot 2023-07-21 at 10.20.07.png>)
+
+After some slow debugging I finally got the map to display properly to make this. wow.
+
+![Alt text](<Screenshot 2023-07-23 at 14.31.35.png>)
