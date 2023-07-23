@@ -1,7 +1,8 @@
 import pygame
-import numpy as np
 import pygame_widgets
 from pygame_widgets.button import Button
+import os
+import numpy as np
 
 class RidgidBody():
     def __init__(self, position: list, mass: int) -> None: #takes in a position as a vector and mass as a scalar
@@ -18,16 +19,18 @@ class RidgidBody():
         self.position += self.velocity
         if self.position <= 720:
             self.velocity *= -1
-        #friction
-        
-class Player(RidgidBody):
-    def __init__(self, position: list, mass: int) -> None:
-        super().__init__(position, mass)
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self,) -> None:
+        super().__init__()
+    
+    def move(direction):
+        if direction == 'up':
+            pass
         
 class Level():
-    def __init__(self, layout, level_ID, surface) -> None:
+    def __init__(self, layout, surface) -> None:
         self.layout = layout
-        self.level_ID = level_ID
         self.tile_size = 64
         self.display_surface = surface
         self.level_setup()
@@ -45,33 +48,36 @@ class Level():
         self.tiles.draw(self.display_surface)
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, position, size):
+    def __init__(self, position, size) -> None:
         super().__init__()
         self.image = pygame.Surface((size, size))
         self.image.fill('black')
         self.rect = self.image.get_rect(topleft = position)
 
-#Pygame Setup
+levels_list = []
 
+def load_levels(surface):
+    with os.scandir('levels/') as entries:
+        for entry in entries:
+            level_layout = []
+            with open(entry, 'r') as level:
+                for line in level:
+                    level_layout.append(line.rstrip("\n"))                    
+            levels_list.append(Level(level_layout, surface))
+
+#CONSTANTS
+GRAVITY = 0.1
+FRAMERATE = 60
+
+#Pygame Setup
 pygame.init()
 screen = pygame.display.set_mode((1024,576))
 clock = pygame.time.Clock()
 running = True
 
-test_level = Level(["                ",
-                    "          XXXX  ",
-                    "XXXX            ",
-                    "XXXXXXXX        ",
-                    "XXXXXXXXXXXX    ",
-                    "XXXXXXXXXXXXXXXX",
-                    "XXXXXXXXXXXXXXXX",
-                    "XXXXXXXXXXXXXXXX",
-                    "XXXXXXXXXXXXXXXX"], 1, screen)
+load_levels(screen)
 
 #Main loop
-
-
-
 while running:
 
     #Events
@@ -84,11 +90,10 @@ while running:
     
     #Render
     screen.fill('white')
-    
-    test_level.display()
-
+    levels_list[0].display()
     pygame.display.flip()
 
-    clock.tick(60)
+    #Clock
+    clock.tick(FRAMERATE)
 
 pygame.quit()
