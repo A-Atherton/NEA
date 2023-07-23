@@ -90,3 +90,15 @@ Error that amkes no sense - Error was boring missed a parenthesis
 After some slow debugging I finally got the map to display properly to make this. wow.
 
 ![Alt text](<Screenshot 2023-07-23 at 14.31.35.png>)
+
+created a levels folder which has some txt files in it storing some simple levels. Also made a test python file which goes through the files in this folder and gets the laevel layouts from each and creates a python list to sort which will be used to create a Level object.
+
+![Alt text](<Screenshot 2023-07-23 at 15.32.22.png>)
+
+result:
+
+![Alt text](<Screenshot 2023-07-23 at 15.33.59.png>)
+
+I implemented the same code as a function with a small change where it appends a Level object to the levels list
+
+![Alt text](<Screenshot 2023-07-23 at 15.52.14.png>)
