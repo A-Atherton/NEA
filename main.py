@@ -20,40 +20,57 @@ class RidgidBody():
             self.velocity *= -1
         #friction
         
-
-ball = RidgidBody([100,300], 2)
-
 class Player(RidgidBody):
     def __init__(self, position: list, mass: int) -> None:
         super().__init__(position, mass)
         
 class Level():
-    def __init__(self, layout, level_ID):
+    def __init__(self, layout, level_ID, surface) -> None:
         self.layout = layout
         self.level_ID = level_ID
-        self.tile_size = 64 
+        self.tile_size = 64
+        self.display_surface = surface
+        self.level_setup()
 
-    def display(self):
+    def level_setup(self) -> None:
+        self.tiles = pygame.sprite.Group()
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
                 x = col_index * self.tile_size
                 y = row_index * self.tile_size
+                if cell == "X":
+                    self.tiles.add(Tile((x,y),self.tile_size))
+
+    def display(self) -> None:
+        self.tiles.draw(self.display_surface)
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, position, size) -> None:
+    def __init__(self, position, size):
         super().__init__()
         self.image = pygame.Surface((size, size))
-        self.image.fill("grey")
+        self.image.fill('black')
         self.rect = self.image.get_rect(topleft = position)
 
 #Pygame Setup
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen = pygame.display.set_mode((1024,576))
 clock = pygame.time.Clock()
 running = True
 
+test_level = Level(["                ",
+                    "          XXXX  ",
+                    "XXXX            ",
+                    "XXXXXXXX        ",
+                    "XXXXXXXXXXXX    ",
+                    "XXXXXXXXXXXXXXXX",
+                    "XXXXXXXXXXXXXXXX",
+                    "XXXXXXXXXXXXXXXX",
+                    "XXXXXXXXXXXXXXXX"], 1, screen)
+
 #Main loop
+
+
 
 while running:
 
@@ -68,6 +85,8 @@ while running:
     #Render
     screen.fill('white')
     
+    test_level.display()
+
     pygame.display.flip()
 
     clock.tick(60)
