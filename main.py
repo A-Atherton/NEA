@@ -4,6 +4,10 @@ from pygame_widgets.button import Button
 import os
 import numpy as np
 
+#CONSTANTS
+FRAMERATE = 60
+
+"""
 class RidgidBody():
     def __init__(self, position: list, mass: int) -> None: #takes in a position as a vector and mass as a scalar
         self.position = np.array(position)
@@ -19,14 +23,45 @@ class RidgidBody():
         self.position += self.velocity
         if self.position <= 720:
             self.velocity *= -1
+"""
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,) -> None:
+    def __init__(self,position) -> None:
         super().__init__()
+        self.image = pygame.Surface((20,32))
+        self.image.fill("red")
+        self.rect = self.image.get_rect(topleft = position)
+        self.direction = pygame.Vector2(0,0)
+
+        self.speed = 8
+        self.gravity = .8
+        self.jump_speed = -16
+        self.jump_counter = 1
     
-    def move(direction):
-        if direction == 'up':
-            pass
+    def get_input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_d]:
+            self.direction.x = self.speed
+        elif keys[pygame.K_a]:
+            self.direction.x = -self.speed
+        else:
+            self.direction.x = 0
+        if keys[pygame.K_w] and self.jump_counter > 0:
+            self.jump()
+
+    def apply_gravity(self):
+        self.direction.y += self.gravity
+
+    def jump(self):
+        self.direction.y = self.jump_speed
+        self.jump_counter -= 1
+        
+
+    def update(self):
+        self.get_input()
+        self.apply_gravity()
+
+
         
 class Level():
     def __init__(self, layout, surface) -> None:
@@ -37,15 +72,48 @@ class Level():
 
     def level_setup(self) -> None:
         self.tiles = pygame.sprite.Group()
+        self.players = pygame.sprite.Group()
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
                 x = col_index * self.tile_size
                 y = row_index * self.tile_size
                 if cell == "X":
                     self.tiles.add(Tile((x,y),self.tile_size))
+                if cell == "P":
+                    self.players.add(Player((x,y)))
 
-    def display(self) -> None:
+    def collision_check(self):
+        for player in self.players.sprites():
+
+            #horizontal check
+            player.rect.x += player.direction.x
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if player.direction.x > 0:
+                        player.rect.right = tile.rect.left
+                    elif player.direction.x < 0:
+                        player.rect.left = tile.rect.right
+            
+            #verticle check
+            player.rect.y += player.direction.y
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(player.rect):
+                    if player.direction.y < 0:
+                        player.rect.top = tile.rect.bottom
+                        player.direction.y = 0
+                    elif player.direction.y > 0:
+                        player.rect.bottom = tile.rect.top
+                        player.jump_counter = 1
+                        player.direction.y = 0
+
+
+    def run(self) -> None:
+        for player in self.players:
+            player.update()
+        self.collision_check()
         self.tiles.draw(self.display_surface)
+        self.players.draw(self.display_surface)
+        
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, position, size) -> None:
@@ -65,9 +133,6 @@ def load_levels(surface):
                     level_layout.append(line.rstrip("\n"))                    
             levels_list.append(Level(level_layout, surface))
 
-#CONSTANTS
-GRAVITY = 0.1
-FRAMERATE = 60
 
 #Pygame Setup
 pygame.init()
@@ -87,11 +152,12 @@ while running:
             running = False
 
     pygame_widgets.update(events)
-    
+
     #Render
     screen.fill('white')
-    levels_list[0].display()
+    levels_list[0].run()
     pygame.display.flip()
+
 
     #Clock
     clock.tick(FRAMERATE)
