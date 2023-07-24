@@ -102,3 +102,12 @@ result:
 I implemented the same code as a function with a small change where it appends a Level object to the levels list
 
 ![Alt text](<Screenshot 2023-07-23 at 15.52.14.png>)
+
+made some collision logic and now I have a player that can walk on the tiles, jump and interact with the world
+
+![Alt text](<Screenshot 2023-07-24 at 11.59.34.png>)
+
+![Alt text](<Screenshot 2023-07-24 at 12.19.59.png>)
+
+movement is currently very fast and unnatural but that will be changed in later versions by using acceleration and decceleration by friction which will make the movement feel more natural. Also movement currently uses the "wasd" keys which is not my favourite method as I would like to use controllers as it is a better method for local multiplayer. I also need to guns and deaths and multiplayer.
+
