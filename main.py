@@ -24,19 +24,32 @@ class RidgidBody():
         if self.position <= 720:
             self.velocity *= -1
 """
+class Weapon(pygame.sprite.Sprite):
+    def __init__(self, name: str, shoot: bool, ammo: int) -> None:
+        super().__init__()
+        self.name = name
+        self.shoot = shoot
+        self.ammo_in_weapon = ammo
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,position) -> None:
         super().__init__()
         self.image = pygame.Surface((20,32))
-        self.image.fill("red")
+        player_image = pygame.image.load(os.path.abspath("assets/player/player.png"))
+        self.image.blit(player_image, dest= (0,0))
         self.rect = self.image.get_rect(topleft = position)
         self.direction = pygame.Vector2(0,0)
 
-        self.speed = 8
+        #movement
+        self.speed = 6
         self.gravity = .8
         self.jump_speed = -16
         self.jump_counter = 1
+
+        #combat
+        self.health = 100
+        self.holding = None
     
     def get_input(self):
         keys = pygame.key.get_pressed()
@@ -55,8 +68,7 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         self.direction.y = self.jump_speed
         self.jump_counter -= 1
-        
-
+    
     def update(self):
         self.get_input()
         self.apply_gravity()
@@ -66,7 +78,7 @@ class Player(pygame.sprite.Sprite):
 class Level():
     def __init__(self, layout, surface) -> None:
         self.layout = layout
-        self.tile_size = 64
+        self.tile_size = 32
         self.display_surface = surface
         self.level_setup()
 
@@ -119,7 +131,8 @@ class Tile(pygame.sprite.Sprite):
     def __init__(self, position, size) -> None:
         super().__init__()
         self.image = pygame.Surface((size, size))
-        self.image.fill('black')
+        tile_image = pygame.image.load(os.path.abspath("assets/tile/New Piskel.png"))
+        self.image.blit(tile_image, (0,0))
         self.rect = self.image.get_rect(topleft = position)
 
 levels_list = []
@@ -140,6 +153,8 @@ screen = pygame.display.set_mode((1024,576))
 clock = pygame.time.Clock()
 running = True
 
+background = pygame.image.load(os.path.abspath("assets/background/Background.png"))
+
 load_levels(screen)
 
 #Main loop
@@ -154,7 +169,7 @@ while running:
     pygame_widgets.update(events)
 
     #Render
-    screen.fill('white')
+    screen.blit(background, (0,0))
     levels_list[0].run()
     pygame.display.flip()
 
