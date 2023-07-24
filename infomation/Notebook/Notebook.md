@@ -111,3 +111,5 @@ made some collision logic and now I have a player that can walk on the tiles, ju
 
 movement is currently very fast and unnatural but that will be changed in later versions by using acceleration and decceleration by friction which will make the movement feel more natural. Also movement currently uses the "wasd" keys which is not my favourite method as I would like to use controllers as it is a better method for local multiplayer. I also need to guns and deaths and multiplayer.
 
+![Alt text](<Screenshot 2023-07-24 at 13.08.50.png>) added a weapon parent class for use later.
+
