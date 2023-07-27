@@ -33,13 +33,13 @@ class Weapon(pygame.sprite.Sprite):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,position) -> None:
+    def __init__(self,position, joystick_id) -> None:
         super().__init__()
-        self.image = pygame.Surface((20,32))
-        player_image = pygame.image.load(os.path.abspath("assets/player/player.png"))
-        self.image.blit(player_image, dest= (0,0))
+        self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.rect = self.image.get_rect(topleft = position)
         self.direction = pygame.Vector2(0,0)
+
+        self.controller = pygame.joystick.Joystick(joystick_id)
 
         #movement
         self.speed = 6
@@ -52,7 +52,9 @@ class Player(pygame.sprite.Sprite):
         self.holding = None
     
     def get_input(self):
+
         keys = pygame.key.get_pressed()
+        
         if keys[pygame.K_d]:
             self.direction.x = self.speed
         elif keys[pygame.K_a]:
@@ -61,7 +63,20 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 0
         if keys[pygame.K_w] and self.jump_counter > 0:
             self.jump()
+        
+        #controller
+        if self.controller.get_button(0) and self.jump_counter > 0: #A
+            self.jump()
+        if self.controller.get_button(1): #B
+            pass
+        if self.controller.get_button(2): #X
+            pass
+        if self.controller.get_button(3): #Y
+            pass
 
+        if self.controller.get_axis(0) > 0.1 or self.controller.get_axis(0) < -0.1: #x +ve
+            self.direction.x = self.speed * self.controller.get_axis(0)
+        
     def apply_gravity(self):
         self.direction.y += self.gravity
 
@@ -80,19 +95,25 @@ class Level():
         self.layout = layout
         self.tile_size = 32
         self.display_surface = surface
+        self.number_of_players = pygame.joystick.get_count()
         self.level_setup()
+
 
     def level_setup(self) -> None:
         self.tiles = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
+        joystick_id = 0
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
                 x = col_index * self.tile_size
                 y = row_index * self.tile_size
                 if cell == "X":
                     self.tiles.add(Tile((x,y),self.tile_size))
-                if cell == "P":
-                    self.players.add(Player((x,y)))
+                if cell == "P" and self.number_of_players > 0:
+                    self.players.add(Player((x,y), joystick_id))
+                    self.number_of_players -= 1
+                    joystick_id += 1
+                    
 
     def collision_check(self):
         for player in self.players.sprites():
@@ -157,6 +178,8 @@ background = pygame.image.load(os.path.abspath("assets/background/Background.png
 
 load_levels(screen)
 
+current_level_counter = 0
+
 #Main loop
 while running:
 
@@ -165,14 +188,18 @@ while running:
     for event in events:
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                current_level_counter += 1
 
     pygame_widgets.update(events)
 
     #Render
     screen.blit(background, (0,0))
-    levels_list[0].run()
-    pygame.display.flip()
 
+    levels_list[current_level_counter % len(levels_list)].run()
+    
+    pygame.display.flip()
 
     #Clock
     clock.tick(FRAMERATE)
