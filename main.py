@@ -33,7 +33,7 @@ class Weapon(pygame.sprite.Sprite):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,position, joystick_id) -> None:
+    def __init__(self,position,joystick_id) -> None:
         super().__init__()
         self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.rect = self.image.get_rect(topleft = position)
@@ -52,7 +52,7 @@ class Player(pygame.sprite.Sprite):
         self.holding = None
     
     def get_input(self):
-
+        """
         keys = pygame.key.get_pressed()
         
         if keys[pygame.K_d]:
@@ -63,19 +63,23 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 0
         if keys[pygame.K_w] and self.jump_counter > 0:
             self.jump()
-        
+        """
+
         #controller
         if self.controller.get_button(0) and self.jump_counter > 0: #A
             self.jump()
         if self.controller.get_button(1): #B
-            pass
+            print("shoot")
         if self.controller.get_button(2): #X
             pass
         if self.controller.get_button(3): #Y
             pass
 
-        if self.controller.get_axis(0) > 0.1 or self.controller.get_axis(0) < -0.1: #x +ve
+        if self.controller.get_axis(0) > 0.2 or self.controller.get_axis(0) < -0.2: #x +ve
             self.direction.x = self.speed * self.controller.get_axis(0)
+        else:
+            self.direction.x = 0
+
         
     def apply_gravity(self):
         self.direction.y += self.gravity
@@ -87,6 +91,12 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.get_input()
         self.apply_gravity()
+
+    def aim_direction(self):
+        x_offset = 50 * self.controller.get_axis(2)
+        y_offset = 50 * self.controller.get_axis(3)
+        aim_cursor_position = (self.rect.x + x_offset + 10, self.rect.y + y_offset + 16)
+        pygame.draw.circle(screen, "white", aim_cursor_position, 4)
 
 
         
@@ -141,10 +151,12 @@ class Level():
 
 
     def run(self) -> None:
-        for player in self.players:
-            player.update()
+
+        self.players.update()
         self.collision_check()
         self.tiles.draw(self.display_surface)
+        for player in self.players:
+            player.aim_direction()
         self.players.draw(self.display_surface)
         
 
