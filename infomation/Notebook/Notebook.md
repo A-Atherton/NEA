@@ -113,3 +113,20 @@ movement is currently very fast and unnatural but that will be changed in later 
 
 ![Alt text](<Screenshot 2023-07-24 at 13.08.50.png>) added a weapon parent class for use later.
 
+![Alt text](<Screenshot 2023-07-27 at 10.50.47.png>)
+
+![Alt text](<Screenshot 2023-07-27 at 14.56.26.png>)
+
+Added controllers which will be the primary method of playing the game.
+
+![Alt text](<Screenshot 2023-07-27 at 15.02.48.png>)
+
+Added circles to show where the players are aiming with the right joystick of a controller
+
+Here is the code that does that.
+![Alt text](<Screenshot 2023-07-27 at 14.57.43.png>)
+
+this code uses the top left of the player as the centre of the aiming circle which doesnt look right
+
+![Alt text](<Screenshot 2023-07-27 at 15.09.45.png>) 
+I fixed this by adding half the width and half the hight of the player onto the position of the circle. 
