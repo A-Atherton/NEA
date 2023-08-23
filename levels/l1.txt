@@ -8,7 +8,7 @@ XXXX                        XXXX
 XXXX        XXXXXXXX        XXXX
                                 
          XXXXX    XXXXX         
-        P              P        
+      S P              P S      
 XX   XXXXXX          XXXXXX   XX
 XX   XXXXXX          XXXXXX   XX
 XX            XXXX            XX

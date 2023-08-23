@@ -25,11 +25,22 @@ class RidgidBody():
             self.velocity *= -1
 """
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, name: str, shoot: bool, ammo: int) -> None:
+    def __init__(self, name: str, shoot: bool, ammo: int, firerate: float, asset_path) -> None:
         super().__init__()
         self.name = name
-        self.shoot = shoot
-        self.ammo_in_weapon = ammo
+        self.shoot = shoot #does the weapon shoot
+        self.ammo_in_weapon = ammo #ammount of ammo left in the weapon
+        self.firerate = firerate
+        self.image = os.path.abspath("assets/weapons/" + asset_path)
+
+#weapons
+
+gun = Weapon("ak47", True, 30, 0.4, "ak47")
+
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self) -> None:
+        super().__init__()
+        self.colour = (255, 187, 92)
 
 
 class Player(pygame.sprite.Sprite):
@@ -49,7 +60,7 @@ class Player(pygame.sprite.Sprite):
 
         #combat
         self.health = 100
-        self.holding = None
+        self.holding = gun
     
     def get_input(self):
         """
@@ -80,6 +91,9 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
+        if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True:
+            self.shoot()
+
         
     def apply_gravity(self):
         self.direction.y += self.gravity
@@ -92,12 +106,17 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
         self.apply_gravity()
 
-    def aim_direction(self):
-        x_offset = 50 * self.controller.get_axis(2)
-        y_offset = 50 * self.controller.get_axis(3)
-        aim_cursor_position = (self.rect.x + x_offset + 10, self.rect.y + y_offset + 16)
-        pygame.draw.circle(screen, "white", aim_cursor_position, 4)
+    def get_aim_direction(self): #draws the direction that the player is aiming
+        x_offset = self.controller.get_axis(2)
+        y_offset = self.controller.get_axis(3)
+        
+        self.aim_direction = (x_offset, y_offset)
 
+        aim_cursor_position = (self.rect.x + self.aim_direction[0] * 50 + 10, self.aim_direction[1] * 50 + y_offset + 16)
+        pygame.draw.circle(screen, "white", aim_cursor_position, 4)
+    
+    def shoot(self):
+        
 
         
 class Level():
@@ -118,11 +137,13 @@ class Level():
                 x = col_index * self.tile_size
                 y = row_index * self.tile_size
                 if cell == "X":
-                    self.tiles.add(Tile((x,y),self.tile_size))
+                    self.tiles.add(Tile((x,y),self.tile_size, True, "standard_tile.png"))
                 if cell == "P" and self.number_of_players > 0:
                     self.players.add(Player((x,y), joystick_id))
                     self.number_of_players -= 1
                     joystick_id += 1
+                if cell == "S":
+                    self.tiles.add(Tile((x,y),self.tile_size, False, "gun_spawn.png"))
                     
 
     def collision_check(self):
@@ -131,7 +152,7 @@ class Level():
             #horizontal check
             player.rect.x += player.direction.x
             for tile in self.tiles.sprites():
-                if tile.rect.colliderect(player.rect):
+                if tile.rect.colliderect(player.rect) and tile.collision == True:
                     if player.direction.x > 0:
                         player.rect.right = tile.rect.left
                     elif player.direction.x < 0:
@@ -140,7 +161,7 @@ class Level():
             #verticle check
             player.rect.y += player.direction.y
             for tile in self.tiles.sprites():
-                if tile.rect.colliderect(player.rect):
+                if tile.rect.colliderect(player.rect) and tile.collision == True:
                     if player.direction.y < 0:
                         player.rect.top = tile.rect.bottom
                         player.direction.y = 0
@@ -161,12 +182,19 @@ class Level():
         
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, position, size) -> None:
+    def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        tile_image = pygame.image.load(os.path.abspath("assets/tile/New Piskel.png"))
-        self.image.blit(tile_image, (0,0))
+        self.image = pygame.image.load(os.path.abspath("assets/tile/" + asset_path))
+        #self.image = pygame.Surface((size, size))
+        #tile_image = pygame.image.load(os.path.abspath("assets/tile/" + asset_path))
+        #self.image.blit(tile_image, (0,0))
         self.rect = self.image.get_rect(topleft = position)
+        self.collision = collision
+
+class Gun_Spawner(Tile):
+    def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
+        super().__init__(position, size, collision, asset_path)
+    
 
 levels_list = []
 
