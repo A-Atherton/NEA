@@ -6,6 +6,7 @@ import numpy as np
 
 #CONSTANTS
 FRAMERATE = 60
+AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
 
 """
 class RidgidBody():
@@ -112,7 +113,7 @@ class Player(pygame.sprite.Sprite):
         
         self.aim_direction = (x_offset, y_offset)
 
-        aim_cursor_position = (self.rect.x + self.aim_direction[0] * 50 + 10, self.aim_direction[1] * 50 + y_offset + 16)
+        aim_cursor_position = (self.rect.x + self.aim_direction[0] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10, self.aim_direction[1] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + y_offset + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
     
     def shoot(self):
