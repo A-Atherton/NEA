@@ -8,40 +8,32 @@ import numpy as np
 FRAMERATE = 60
 AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
 
-"""
-class RidgidBody():
-    def __init__(self, position: list, mass: int) -> None: #takes in a position as a vector and mass as a scalar
-        self.position = np.array(position)
-        self.velocity = np.array([0,0])
-        self.acceleration = np.array([0,0])
-        self.mass = np.array(mass)
-    
-    def add_force(self, force:list): 
-        self.acceleration += np.array(force) // self.mass
 
-    def update(self):
-        self.velocity += self.acceleration
-        self.position += self.velocity
-        if self.position <= 720:
-            self.velocity *= -1
-"""
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, name: str, shoot: bool, ammo: int, firerate: float, asset_path) -> None:
+    def __init__(self, name: str, shoot: bool, ammo: int, firerate: float, asset_path:str, bullet_speed) -> None:
         super().__init__()
         self.name = name
         self.shoot = shoot #does the weapon shoot
         self.ammo_in_weapon = ammo #ammount of ammo left in the weapon
         self.firerate = firerate
         self.image = os.path.abspath("assets/weapons/" + asset_path)
+        self.bullet_speed = bullet_speed
 
 #weapons
 
-gun = Weapon("ak47", True, 30, 0.4, "ak47")
+gun = Weapon("ak47", True, 30, 0.4, "ak47", 10)
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self, position: tuple, velocity: tuple) -> None:
         super().__init__()
-        self.colour = (255, 187, 92)
+        self.image = pygame.surface.Surface((4,4))
+        self.image.fill((255, 187, 92))
+        self.rect = self.image.get_rect(topleft = position)
+        self.velocity = velocity
+
+    def update(self):
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
 
 
 class Player(pygame.sprite.Sprite):
@@ -52,6 +44,8 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2(0,0)
 
         self.controller = pygame.joystick.Joystick(joystick_id)
+
+        self.aim_direction = (0.0,0.0)
 
         #movement
         self.speed = 6
@@ -92,8 +86,10 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-        if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True:
-            self.shoot()
+        if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0:
+            self.shoot(self.holding.bullet_speed)
+            self.holding.ammo_in_weapon -= 0
+
 
         
     def apply_gravity(self):
@@ -113,10 +109,15 @@ class Player(pygame.sprite.Sprite):
         
         self.aim_direction = (x_offset, y_offset)
 
-        aim_cursor_position = (self.rect.x + self.aim_direction[0] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10, self.aim_direction[1] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + y_offset + 16)
+        aim_cursor_position = (self.rect.x + self.aim_direction[0] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
+                               self.rect.y + self.aim_direction[1] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
     
-    def shoot(self):
+    def shoot(self, bullet_speed):
+        
+        current_level.bullets.add(Bullet((self.rect.x,self.rect.y),
+                                          (self.aim_direction[0] * bullet_speed, self.aim_direction[1] * bullet_speed)))
+        
         
 
         
@@ -132,6 +133,7 @@ class Level():
     def level_setup(self) -> None:
         self.tiles = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
         joystick_id = 0
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
@@ -175,11 +177,13 @@ class Level():
     def run(self) -> None:
 
         self.players.update()
+        self.bullets.update()
         self.collision_check()
         self.tiles.draw(self.display_surface)
         for player in self.players:
-            player.aim_direction()
+            player.get_aim_direction()
         self.players.draw(self.display_surface)
+        self.bullets.draw(self.display_surface)
         
 
 class Tile(pygame.sprite.Sprite):
@@ -238,7 +242,8 @@ while running:
     #Render
     screen.blit(background, (0,0))
 
-    levels_list[current_level_counter % len(levels_list)].run()
+    current_level = levels_list[current_level_counter % len(levels_list)]
+    current_level.run()
     
     pygame.display.flip()
 
