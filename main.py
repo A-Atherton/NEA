@@ -10,27 +10,41 @@ from pygame_widgets.textbox import TextBox
 #CONSTANTS
 FRAMERATE = 60
 AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
+OFFSET_OF_GUN_FROM_PLAYER = pygame.Vector2(-32, 8)
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, name: str, shoot: bool, ammo: int, firerate: float, asset_path:str, bullet_speed: int) -> None:
+    def __init__( self, name: str, shoot: bool, ammo: int, firerate: float, asset_path: str, bullet_speed: int, position:pygame.Vector2) -> None:
         super().__init__()
+        position += OFFSET_OF_GUN_FROM_PLAYER
         self.asset_path = asset_path
         self.name = name
         self.shoot = shoot #does the weapon shoot
         self.ammo_in_weapon = ammo #ammount of ammo left in the weapon
         self.firerate = firerate
         self.bullet_speed = bullet_speed
-
-class Ak47(Weapon):
-    def __init__(self, position) -> None:
-        super().__init__("ak47", True, 30, 0.2, "ak47.png", 30)
         self.image = pygame.image.load(os.path.abspath("assets/weapons/" + self.asset_path))
         self.rect = self.image.get_rect(topleft= position)
     
     def update(self, position):
+        position += OFFSET_OF_GUN_FROM_PLAYER
         self.rect.x = position.x
         self.rect.y = position.y
+
+#weapons
+
+class Ak47(Weapon):
+    def __init__(self, position: pygame.Vector2) -> None:
+        super().__init__("ak47", True, 30, 0.2, "ak47.png", 30, position)
+
+class Smg(Weapon): #Needs assets
+    def __init__(self, position) -> None:
+        super().__init__("smg", True, 25, 0.07, None, 30, position)
+
+class Sword(Weapon): #Needs assets
+    def __init(self, position) -> None:
+        super().__init__("sword", False, 0, 0, None, 0, position)
+
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -92,7 +106,7 @@ class Player(pygame.sprite.Sprite):
         if self.controller.get_button(2): #X
             pass
         if self.controller.get_button(3): #Y
-            pass
+            self.holding = None
 
         if self.controller.get_axis(0) > 0.2 or self.controller.get_axis(0) < -0.2: #x +ve
             self.direction.x = self.speed * self.controller.get_axis(0)
@@ -105,7 +119,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0 and time_since_last_shot > self.holding.firerate * 1000:
             self.shoot(self.holding.bullet_speed)
-            self.holding.ammo_in_weapon -= 0
+            self.holding.ammo_in_weapon -= 1
             self.time_of_last_shot = pygame.time.get_ticks()
         
     def apply_gravity(self):
@@ -141,10 +155,6 @@ class Player(pygame.sprite.Sprite):
         current_level.weapons.add(self.holding)
         
 
-        
-        
-
-        
 class Level():
     def __init__(self, layout, surface) -> None:
         self.layout = layout
@@ -180,11 +190,14 @@ class Level():
             #horizontal check
             player.rect.x += player.direction.x
             for tile in self.tiles.sprites():
-                if tile.rect.colliderect(player.rect) and tile.collision == True:
-                    if player.direction.x > 0:
-                        player.rect.right = tile.rect.left
-                    elif player.direction.x < 0:
-                        player.rect.left = tile.rect.right
+                if tile.rect.colliderect(player.rect):
+                    if tile.collision == True:    
+                        if player.direction.x > 0:
+                            player.rect.right = tile.rect.left
+                        elif player.direction.x < 0:
+                            player.rect.left = tile.rect.right
+                    elif tile.collision == False and player.holding == None:
+                        player.pick_up()
             
             #verticle check
             player.rect.y += player.direction.y
@@ -204,6 +217,9 @@ class Level():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
                     bullet.kill()
 
+            for player in self.players:
+                if player.rect.collliderect(bullet.rect):
+                    pass
 
 
 
