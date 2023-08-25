@@ -4,37 +4,51 @@ from pygame_widgets.button import Button
 import os
 import numpy as np
 
+from pygame_widgets.textbox import TextBox
+
+
 #CONSTANTS
 FRAMERATE = 60
 AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, name: str, shoot: bool, ammo: int, firerate: float, asset_path:str, bullet_speed) -> None:
+    def __init__(self, name: str, shoot: bool, ammo: int, firerate: float, asset_path:str, bullet_speed: int) -> None:
         super().__init__()
+        self.asset_path = asset_path
         self.name = name
         self.shoot = shoot #does the weapon shoot
         self.ammo_in_weapon = ammo #ammount of ammo left in the weapon
         self.firerate = firerate
-        self.image = os.path.abspath("assets/weapons/" + asset_path)
         self.bullet_speed = bullet_speed
 
-#weapons
+class Ak47(Weapon):
+    def __init__(self, position) -> None:
+        super().__init__("ak47", True, 30, 0.2, "ak47.png", 30)
+        self.image = pygame.image.load(os.path.abspath("assets/weapons/" + self.asset_path))
+        self.rect = self.image.get_rect(topleft= position)
+    
+    def update(self, position):
+        self.rect.x = position.x
+        self.rect.y = position.y
 
-gun = Weapon("ak47", True, 30, 0.4, "ak47", 10)
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, position: tuple, velocity: tuple) -> None:
         super().__init__()
-        self.image = pygame.surface.Surface((4,4))
+        self.image = pygame.surface.Surface((6,6))
         self.image.fill((255, 187, 92))
         self.rect = self.image.get_rect(topleft = position)
         self.velocity = velocity
+        self.lifetime = 20
+        self.birth_time = pygame.time.get_ticks()
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-
+        if self.lifetime > self.birth_time:
+            self.kill()
+        
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,position,joystick_id) -> None:
@@ -42,10 +56,9 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.rect = self.image.get_rect(topleft = position)
         self.direction = pygame.Vector2(0,0)
-
         self.controller = pygame.joystick.Joystick(joystick_id)
-
-        self.aim_direction = (0.0,0.0)
+        self.aim_direction = pygame.Vector2(0,0)
+        self.time_of_last_shot = 0
 
         #movement
         self.speed = 6
@@ -55,7 +68,7 @@ class Player(pygame.sprite.Sprite):
 
         #combat
         self.health = 100
-        self.holding = gun
+        self.holding = None
     
     def get_input(self):
         """
@@ -75,7 +88,7 @@ class Player(pygame.sprite.Sprite):
         if self.controller.get_button(0) and self.jump_counter > 0: #A
             self.jump()
         if self.controller.get_button(1): #B
-            print("shoot")
+            pass
         if self.controller.get_button(2): #X
             pass
         if self.controller.get_button(3): #Y
@@ -86,11 +99,14 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-        if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0:
+        #shooting
+
+        time_since_last_shot = pygame.time.get_ticks()- self.time_of_last_shot 
+
+        if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0 and time_since_last_shot > self.holding.firerate * 1000:
             self.shoot(self.holding.bullet_speed)
             self.holding.ammo_in_weapon -= 0
-
-
+            self.time_of_last_shot = pygame.time.get_ticks()
         
     def apply_gravity(self):
         self.direction.y += self.gravity
@@ -102,21 +118,29 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.get_input()
         self.apply_gravity()
+        if self.holding != None:
+            self.holding.update(pygame.Vector2(self.rect.x, self.rect.y))
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         x_offset = self.controller.get_axis(2)
         y_offset = self.controller.get_axis(3)
         
-        self.aim_direction = (x_offset, y_offset)
+        self.aim_direction = pygame.Vector2(x_offset, y_offset)
 
-        aim_cursor_position = (self.rect.x + self.aim_direction[0] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
-                               self.rect.y + self.aim_direction[1] * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
+        aim_cursor_position = (self.rect.x + self.aim_direction.x * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
+                               self.rect.y + self.aim_direction.y * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
     
     def shoot(self, bullet_speed):
         
-        current_level.bullets.add(Bullet((self.rect.x,self.rect.y),
-                                          (self.aim_direction[0] * bullet_speed, self.aim_direction[1] * bullet_speed)))
+        current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
+                                          (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
+    
+    def pick_up(self):
+        self.holding = Ak47((self.rect.x, self.rect.y))
+        current_level.weapons.add(self.holding)
+        
+
         
         
 
@@ -134,6 +158,7 @@ class Level():
         self.tiles = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
+        self.weapons = pygame.sprite.Group()
         joystick_id = 0
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
@@ -149,7 +174,7 @@ class Level():
                     self.tiles.add(Tile((x,y),self.tile_size, False, "gun_spawn.png"))
                     
 
-    def collision_check(self):
+    def player_collision_check(self) -> None:
         for player in self.players.sprites():
 
             #horizontal check
@@ -172,18 +197,28 @@ class Level():
                         player.rect.bottom = tile.rect.top
                         player.jump_counter = 1
                         player.direction.y = 0
+    
+    def bullet_collision_check(self) -> None: #kills the bullet if it hits a solid tile
+        for bullet in self.bullets.sprites():
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(bullet.rect) and tile.collision == True:
+                    bullet.kill()
+
+
 
 
     def run(self) -> None:
 
         self.players.update()
         self.bullets.update()
-        self.collision_check()
+        self.player_collision_check()
+        self.bullet_collision_check()
         self.tiles.draw(self.display_surface)
         for player in self.players:
             player.get_aim_direction()
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
+        self.weapons.draw(self.display_surface)
         
 
 class Tile(pygame.sprite.Sprite):
@@ -236,6 +271,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
                 current_level_counter += 1
+            if event.key == pygame.K_0:
+                for player in current_level.players:
+                    player.pick_up()
 
     pygame_widgets.update(events)
 
