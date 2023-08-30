@@ -33,6 +33,100 @@ Here you can see that the object called ball is being drawn to the screen:
 
 It does not move as no forces are acting on it.
 
+I created a class called player which I will use later
+
+![Alt text](<Screenshot 2023-07-19 at 18.03.21.png>)
+
+thinking of doing levels with a level map string after looking at a [video](https://www.youtube.com/watch?v=YWN8GcmJ-jA)
+
+![Alt text](<Screenshot 2023-07-19 at 18.13.54.png>)
+
+
+
+``` python
+
+class Level():
+  def __init__(self, level, level_ID):
+    self.level = level
+    self.level_ID = level_ID
+
+level1 = Level([
+      "      ",
+      "XX  XX",
+      "XXXXXX"
+    ], 23)
+```
+
+will run a function that gets all levels from a file that comes with the game. This can be added or removed from.
+
+when a level is being played the level can be changed by destroying tiles. this will not effect the levels that are stored in the file.
+
+created a class for the level and for the tiles both from the above tutorial video
+
+![Alt text](<Screenshot 2023-07-19 at 19.03.49.png>)
+
+I created a test tile and drew it
+
+![Alt text](<Screenshot 2023-07-19 at 19.12.02.png>)
+![Alt text](<Screenshot 2023-07-19 at 19.12.10.png>)
+
+here is the result
+
+![Alt text](<Screenshot 2023-07-19 at 19.11.44.png>)
+
+
+created a method that runs when the object is created
+
+![Alt text](<Screenshot 2023-07-21 at 10.20.31.png>)
+
+It adds a tile to a group of sprites if there is an "X" in the level layout in that position. 
+
+![Alt text](<Screenshot 2023-07-21 at 10.20.43.png>)
+
+Error that amkes no sense - Error was boring missed a parenthesis
+
+![Alt text](<Screenshot 2023-07-21 at 10.20.07.png>)
+
+After some slow debugging I finally got the map to display properly to make this. wow.
+
+![Alt text](<Screenshot 2023-07-23 at 14.31.35.png>)
+
+created a levels folder which has some txt files in it storing some simple levels. Also made a test python file which goes through the files in this folder and gets the laevel layouts from each and creates a python list to sort which will be used to create a Level object.
+
+![Alt text](<Screenshot 2023-07-23 at 15.32.22.png>)
+
+result:
+
+![Alt text](<Screenshot 2023-07-23 at 15.33.59.png>)
+
+I implemented the same code as a function with a small change where it appends a Level object to the levels list
+
+![Alt text](<Screenshot 2023-07-23 at 15.52.14.png>)
+
+made some collision logic and now I have a player that can walk on the tiles, jump and interact with the world
+
+![Alt text](<Screenshot 2023-07-24 at 11.59.34.png>)
+
+![Alt text](<Screenshot 2023-07-24 at 12.19.59.png>)
+
+movement is currently very fast and unnatural but that will be changed in later versions by using acceleration and decceleration by friction which will make the movement feel more natural. Also movement currently uses the "wasd" keys which is not my favourite method as I would like to use controllers as it is a better method for local multiplayer. I also need to guns and deaths and multiplayer.
+
+![Alt text](<Screenshot 2023-07-24 at 13.08.50.png>) added a weapon parent class for use later.
+
+![Alt text](<Screenshot 2023-07-27 at 10.50.47.png>)
+
+![Alt text](<Screenshot 2023-07-27 at 14.56.26.png>)
+
+Added controllers which will be the primary method of playing the game.
+
+![Alt text](<Screenshot 2023-07-27 at 15.02.48.png>)
+
+Added circles to show where the players are aiming with the right joystick of a controller
+
+Here is the code that does that.
+![Alt text](<Screenshot 2023-07-27 at 14.57.43.png>)
+
+this code uses the top left of the player as the centre of the aiming circle which doesnt look right
 Used pygame_widgets to do some tests
 
 ![Alt text](<Screenshot from 2023-07-11 16-06-40.png>)
@@ -40,3 +134,5 @@ Used pygame_widgets to do some tests
 and created a new method to add gravity
 
 ![Alt text](<Screenshot from 2023-07-11 16-07-02.png>)
+![Alt text](<Screenshot 2023-07-27 at 15.09.45.png>) 
+I fixed this by adding half the width and half the hight of the player onto the position of the circle. 

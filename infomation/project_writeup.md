@@ -9,7 +9,7 @@ A 2d platformer / shooter which should have two game modes:
 * Vs - two or more players play against each other in a deathmatch game
 * Single Player / Coop - one or more players fight against waves of npc enemies
 
-It should use local multiplayer and platforms should be destructible breaking into pieces when shot using an algorithm to determine the fragmentation pattern of the platform. The NPCs should use path finding algorithms to find the way over rubble from broken platforms to the player(s).
+It should use local multiplayer and platforms should be destructible breaking into pieces when shot using an algorithm to determine the fragmentation pattern of the platform. The NPCs should use path finding algorithms to find the way over rubble from broken platforms to the player(s). As a last addition I will add a custom level designer which is easy for users to use.
 
 ## **Analysis**
 
@@ -29,11 +29,11 @@ Users who do not speak english should be considered so easy methods of chosing l
 
 My teacher is also a stakeholder. They need the game to be completed within a time frame and to have a large amount of algorithmic complexity.
 
-### **Research and Identificatiom of Solutions to the problem**
+### **Research and Identification of Solutions to the problem**
 
 #### **Platforms for designs**
 
-There are two options for languages that i have considered:
+I have considered two options for languages to develop the software:
 
 1. C++
 2. Python
@@ -59,21 +59,36 @@ Stick fight:
 - Online multiplayer can be buggy
 
 frog smashers:
-+ Also fast paced
-+ 
+
++ Fast paced
++ Simple
++ Open source?
+
+- 
+- 
+- 
+
+
+
+<ins>**Conclusions**</ins>
+
+My game should be open source and fast paced. It should avoid...
 
 ### **Essential Features**
 
 * Player versus player (pvp) combat is an essensial feature. It is important as users want to play against each other.
+* 
 
 ### **Limitations**
 
-* The proposed system will only use local multiplayer 
+* The proposed system will only use local multiplayer. There will be no online multiplayer as this will be difficult to implement and is out of the scope of my game.
+* 
 
 ### **Objectives**
 
-* Fragmentation of platforms
+* Fragmentation of platforms when hit by projectiles
 * Collisions between entities in the game
 * Collisions between players and objects
 * The game should run with FPS over 60 for smooth game play
+* NPC enemies which can path find to the player
 * 
