@@ -33,3 +33,10 @@ Here you can see that the object called ball is being drawn to the screen:
 
 It does not move as no forces are acting on it.
 
+Used pygame_widgets to do some tests
+
+![Alt text](<Screenshot from 2023-07-11 16-06-40.png>)
+
+and created a new method to add gravity
+
+![Alt text](<Screenshot from 2023-07-11 16-07-02.png>)

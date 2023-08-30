@@ -4,18 +4,22 @@ import pygame_widgets
 from pygame_widgets.button import Button
 
 class RidgidBody():
-    def __init__(self, position: list, mass: int) -> None: #takes in a position as a vector and mass as a scalar
-        self.position = np.array(position)
-        self.velocity = np.array([0,0])
-        self.acceleration = np.array([0,0])
-        self.mass = np.array(mass)
+    def __init__(self, position: list, mass: float) -> None: #takes in a position as a vector and mass as a scalar
+        self.position = np.array(position, float)
+        self.velocity = np.array([0,0], float)
+        self.acceleration = np.array([0,0], float)
+        self.mass = np.array(mass, float)
     
-    def add_force(self, force:list): 
-        self.acceleration += np.array(force) // self.mass
+    def add_force(self, force:list) -> None: 
+        self.acceleration += np.array(force, float) / self.mass
 
-    def update(self):
+    def update(self) -> None:
         self.velocity += self.acceleration
         self.position += self.velocity
+
+    def gravity(self) -> None:
+       self.add_force([0, 9.81 * self.mass])
+
 
 ball = RidgidBody([100,300], 2)
 
@@ -32,7 +36,7 @@ running = True
 button = Button(screen,100,100,
                      60,20,
                          text="gravity",
-                           onClick=lambda: ball.add_force([0,50*10]))
+                           onClick=lambda: ball.gravity())
 
 
 #Main loop
@@ -57,6 +61,8 @@ while running:
     #Flip
 
     pygame.display.flip()
+
+    ball.update()
 
     clock.tick(60)
 
