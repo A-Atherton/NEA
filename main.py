@@ -301,8 +301,6 @@ while running:
     
     pygame.display.flip()
 
-    ball.update()
-
     #Clock
     clock.tick(FRAMERATE)
 
