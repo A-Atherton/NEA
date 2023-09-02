@@ -127,6 +127,12 @@ Here is the code that does that.
 ![Alt text](<Screenshot 2023-07-27 at 14.57.43.png>)
 
 this code uses the top left of the player as the centre of the aiming circle which doesnt look right
+Used pygame_widgets to do some tests
 
+![Alt text](<Screenshot from 2023-07-11 16-06-40.png>)
+
+and created a new method to add gravity
+
+![Alt text](<Screenshot from 2023-07-11 16-07-02.png>)
 ![Alt text](<Screenshot 2023-07-27 at 15.09.45.png>) 
 I fixed this by adding half the width and half the hight of the player onto the position of the circle. 
