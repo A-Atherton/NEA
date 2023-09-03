@@ -4,7 +4,6 @@ from pygame_widgets.button import Button
 import os
 import math
 #import random
-
 from pygame_widgets.textbox import TextBox
 
 
@@ -62,7 +61,7 @@ class Bullet(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-        if self.lifetime > self.birth_time:
+        if self.birth_time > self.lifetime:
             self.kill()
         
 
@@ -147,9 +146,10 @@ class Player(pygame.sprite.Sprite):
         y_offset = self.controller.get_axis(3)
 
         distance = math.sqrt(x_offset**2 + y_offset**2)
-
-        self.aim_direction = pygame.Vector2(x_offset / distance, y_offset/ distance)
-
+        if distance > 0:
+            self.aim_direction = pygame.Vector2(x_offset / distance, y_offset/ distance)
+        else:
+            self.aim_direction = pygame.Vector2(0,0)
         aim_cursor_position = (self.rect.x + self.aim_direction.x * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
                                self.rect.y + self.aim_direction.y * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
@@ -269,6 +269,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = position)
         self.collision = collision
 
+
 class Gun_Spawner(Tile):
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
         super().__init__(position, size, collision, asset_path)
@@ -285,10 +286,8 @@ class Gun_Spawner(Tile):
         self.time_of_last_spawn = pygame.time.get_ticks()
 
 
-
-    
-
 levels_list = []
+
 
 def load_levels(surface):
     with os.scandir('levels/') as entries:
@@ -299,16 +298,14 @@ def load_levels(surface):
                     level_layout.append(line.rstrip("\n"))                    
             levels_list.append(Level(level_layout, surface))
 
+
 #Pygame Setup
 pygame.init()
 screen = pygame.display.set_mode((1024,576))
 clock = pygame.time.Clock()
 running = True
-
 background = pygame.image.load(os.path.abspath("assets/background/Background.png"))
-
 load_levels(screen)
-
 current_level_counter = 0
 
 #Main loop
