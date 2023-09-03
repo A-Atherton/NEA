@@ -176,6 +176,7 @@ class Level():
         self.players = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.weapons = pygame.sprite.Group()
+        self.spawners = pygame.sprite.Group()
         joystick_id = 0
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
@@ -188,7 +189,7 @@ class Level():
                     self.number_of_players -= 1
                     joystick_id += 1
                 if cell == "S":
-                    self.tiles.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
+                    self.spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
                     
     def player_collision_check(self) -> None:
         for player in self.players.sprites():
@@ -202,11 +203,6 @@ class Level():
                             player.rect.right = tile.rect.left
                         elif player.direction.x < 0:
                             player.rect.left = tile.rect.right
-                    elif tile.collision == False and player.holding == None and tile.holding != None:
-                        player.pick_up(tile.holding)
-                        tile.holding = None
-
-
             
             #verticle check
             player.rect.y += player.direction.y
@@ -231,6 +227,11 @@ class Level():
                     if weapon.rect.colliderect(player.rect):
                         player.holding = weapon
 
+            for spawner in self.spawners:
+                if player.holding == None and spawner.holding != None and spawner.rect.colliderect(player.rect):
+                    player.pick_up(spawner.holding)
+                    spawner.holding = None
+
 
     def bullet_collision_check(self) -> None: #kills the bullet if it hits a solid tile
         for bullet in self.bullets.sprites():
@@ -246,6 +247,7 @@ class Level():
 
         self.players.update()
         self.bullets.update()
+        self.spawners.update()
         self.player_collision_check()
         self.bullet_collision_check()
         self.tiles.draw(self.display_surface)
@@ -254,6 +256,7 @@ class Level():
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
         self.weapons.draw(self.display_surface)
+        self.spawners.draw(self.display_surface)
         
 
 class Tile(pygame.sprite.Sprite):
@@ -269,14 +272,19 @@ class Tile(pygame.sprite.Sprite):
 class Gun_Spawner(Tile):
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
         super().__init__(position, size, collision, asset_path)
+        self.holding = None
+        self.time_of_last_spawn = 0
+        
+
+    def update(self):
+        if pygame.time.get_ticks() - self.time_of_last_spawn >= 10_000 and self.holding == None:
+            self.spawn_gun()
+
+
+    def spawn_gun(self):
         self.holding = Ak47(pygame.Vector2(self.rect.x, self.rect.y))
         current_level.weapons.add(self.holding)
-
-    def update():
-        pass
-
-    def spawn_gun():
-        pass
+        self.time_of_last_spawn = pygame.time.get_ticks()
 
 
 
