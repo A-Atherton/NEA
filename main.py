@@ -30,12 +30,12 @@ class Weapon(pygame.sprite.Sprite):
         position += OFFSET_OF_GUN_FROM_PLAYER
         self.rect.x = position.x
         self.rect.y = position.y
-
+        
+    
 #weapons
-
 class Ak47(Weapon):
     def __init__(self, position: pygame.Vector2) -> None:
-        super().__init__("ak47", True, 30, 0.2, "ak47.png", 30, position)
+        super().__init__("ak47", True, 30, 0.1, "ak47.png", 30, position)
 
 class Smg(Weapon): #Needs assets
     def __init__(self, position) -> None:
@@ -134,6 +134,11 @@ class Player(pygame.sprite.Sprite):
         self.apply_gravity()
         if self.holding != None:
             self.holding.update(pygame.Vector2(self.rect.x, self.rect.y))
+            if self.holding.ammo_in_weapon <= 0:
+                self.holding.kill()
+                self.holding = None
+        if self.health <= 0:
+            self.kill()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         x_offset = self.controller.get_axis(2)
@@ -150,10 +155,13 @@ class Player(pygame.sprite.Sprite):
         current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
-    def pick_up(self):
-        self.holding = Ak47((self.rect.x, self.rect.y))
+    def pick_up(self, weapon):
+        self.holding = weapon
         current_level.weapons.add(self.holding)
         
+    def do_damage(self, damage_amount: int):
+        self.health -= damage_amount
+
 
 class Level():
     def __init__(self, layout, surface) -> None:
@@ -162,7 +170,6 @@ class Level():
         self.display_surface = surface
         self.number_of_players = pygame.joystick.get_count()
         self.level_setup()
-
 
     def level_setup(self) -> None:
         self.tiles = pygame.sprite.Group()
@@ -181,9 +188,8 @@ class Level():
                     self.number_of_players -= 1
                     joystick_id += 1
                 if cell == "S":
-                    self.tiles.add(Tile((x,y),self.tile_size, False, "gun_spawn.png"))
+                    self.tiles.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
                     
-
     def player_collision_check(self) -> None:
         for player in self.players.sprites():
 
@@ -196,8 +202,11 @@ class Level():
                             player.rect.right = tile.rect.left
                         elif player.direction.x < 0:
                             player.rect.left = tile.rect.right
-                    elif tile.collision == False and player.holding == None:
-                        player.pick_up()
+                    elif tile.collision == False and player.holding == None and tile.holding != None:
+                        player.pick_up(tile.holding)
+                        tile.holding = None
+
+
             
             #verticle check
             player.rect.y += player.direction.y
@@ -210,19 +219,29 @@ class Level():
                         player.rect.bottom = tile.rect.top
                         player.jump_counter = 1
                         player.direction.y = 0
-    
+
+            #bullet check
+            for bullet in self.bullets:
+                if bullet.rect.colliderect(player.rect):
+                    print("player is dead")
+                    player.do_damage(15)
+            #weapon check
+            for weapon in self.weapons:
+                if player.holding == None:
+                    if weapon.rect.colliderect(player.rect):
+                        player.holding = weapon
+
+
     def bullet_collision_check(self) -> None: #kills the bullet if it hits a solid tile
         for bullet in self.bullets.sprites():
             for tile in self.tiles.sprites():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
                     bullet.kill()
-
-            for player in self.players:
-                if player.rect.collliderect(bullet.rect):
-                    pass
-
-
-
+        
+    def weapon_collision_check(self) -> None:
+        pass
+        
+    
     def run(self) -> None:
 
         self.players.update()
@@ -250,6 +269,17 @@ class Tile(pygame.sprite.Sprite):
 class Gun_Spawner(Tile):
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
         super().__init__(position, size, collision, asset_path)
+        self.holding = Ak47(pygame.Vector2(self.rect.x, self.rect.y))
+        current_level.weapons.add(self.holding)
+
+    def update():
+        pass
+
+    def spawn_gun():
+        pass
+
+
+
     
 
 levels_list = []
@@ -262,7 +292,6 @@ def load_levels(surface):
                 for line in level:
                     level_layout.append(line.rstrip("\n"))                    
             levels_list.append(Level(level_layout, surface))
-
 
 #Pygame Setup
 pygame.init()
@@ -278,7 +307,6 @@ current_level_counter = 0
 
 #Main loop
 while running:
-
     #Events
     events = pygame.event.get()
     for event in events:
