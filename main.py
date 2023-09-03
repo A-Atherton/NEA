@@ -2,7 +2,8 @@ import pygame
 import pygame_widgets
 from pygame_widgets.button import Button
 import os
-import numpy as np
+import math
+#import random
 
 from pygame_widgets.textbox import TextBox
 
@@ -10,7 +11,9 @@ from pygame_widgets.textbox import TextBox
 #CONSTANTS
 FRAMERATE = 60
 AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
-OFFSET_OF_GUN_FROM_PLAYER = pygame.Vector2(-32, 8)
+OFFSET_OF_GUN_FROM_PLAYER = pygame.Vector2(0,0)
+WEAPON_CAP_AMOUNT = 6
+WEAPON_SPAWN_RATE_IN_MILLIS = 10_000
 
 
 class Weapon(pygame.sprite.Sprite):
@@ -44,7 +47,6 @@ class Smg(Weapon): #Needs assets
 class Sword(Weapon): #Needs assets
     def __init(self, position) -> None:
         super().__init__("sword", False, 0, 0, None, 0, position)
-
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -143,8 +145,10 @@ class Player(pygame.sprite.Sprite):
     def get_aim_direction(self): #draws the direction that the player is aiming
         x_offset = self.controller.get_axis(2)
         y_offset = self.controller.get_axis(3)
-        
-        self.aim_direction = pygame.Vector2(x_offset, y_offset)
+
+        distance = math.sqrt(x_offset**2 + y_offset**2)
+
+        self.aim_direction = pygame.Vector2(x_offset / distance, y_offset/ distance)
 
         aim_cursor_position = (self.rect.x + self.aim_direction.x * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
                                self.rect.y + self.aim_direction.y * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
@@ -219,19 +223,13 @@ class Level():
             #bullet check
             for bullet in self.bullets:
                 if bullet.rect.colliderect(player.rect):
-                    print("player is dead")
                     player.do_damage(15)
+                    bullet.kill()
             #weapon check
             for weapon in self.weapons:
                 if player.holding == None:
                     if weapon.rect.colliderect(player.rect):
                         player.holding = weapon
-
-            for spawner in self.spawners:
-                if player.holding == None and spawner.holding != None and spawner.rect.colliderect(player.rect):
-                    player.pick_up(spawner.holding)
-                    spawner.holding = None
-
 
     def bullet_collision_check(self) -> None: #kills the bullet if it hits a solid tile
         for bullet in self.bullets.sprites():
@@ -240,7 +238,9 @@ class Level():
                     bullet.kill()
         
     def weapon_collision_check(self) -> None:
-        pass
+        
+        for tile in self.tiles:
+            pass
         
     
     def run(self) -> None:
@@ -272,18 +272,16 @@ class Tile(pygame.sprite.Sprite):
 class Gun_Spawner(Tile):
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
         super().__init__(position, size, collision, asset_path)
-        self.holding = None
         self.time_of_last_spawn = 0
         
 
     def update(self):
-        if pygame.time.get_ticks() - self.time_of_last_spawn >= 10_000 and self.holding == None:
+        if pygame.time.get_ticks() - self.time_of_last_spawn >= 10_000 and len(current_level.weapons) < WEAPON_CAP_AMOUNT:
             self.spawn_gun()
-
+        
 
     def spawn_gun(self):
-        self.holding = Ak47(pygame.Vector2(self.rect.x, self.rect.y))
-        current_level.weapons.add(self.holding)
+        current_level.weapons.add(Ak47(pygame.Vector2(self.rect.x, self.rect.y)))
         self.time_of_last_spawn = pygame.time.get_ticks()
 
 
