@@ -69,8 +69,7 @@ class Bullet(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self,position,joystick_id) -> None:
         super().__init__()
-        self.current_image = os.path.abspath("assets/player/player.png")
-        self.image = pygame.image.load(self.current_image)
+        self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.rect = self.image.get_rect(topleft = position)
         self.direction = pygame.Vector2(0,0)
         self.controller = pygame.joystick.Joystick(joystick_id)
@@ -143,6 +142,8 @@ class Player(pygame.sprite.Sprite):
                 self.holding = None
         if self.health <= 0:
             self.kill()
+        
+        self.facing()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         x_offset = self.controller.get_axis(2)
@@ -160,7 +161,6 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
     
     def shoot(self, bullet_speed):
-        print("attempt")
         print(self.aim_direction)
         current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
@@ -174,9 +174,11 @@ class Player(pygame.sprite.Sprite):
 
     def facing(self):
         if self.direction.x > 0:
-            self.flip = True
+            True
+            print("flip", self.direction)
         else:
             self.flip = False
+        self.image = pygame.transform.flip(pygame.image.load(os.path.abspath("assets/player/player.png")), self.flip, False)
 
 
 
