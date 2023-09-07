@@ -146,16 +146,23 @@ class Player(pygame.sprite.Sprite):
         y_offset = self.controller.get_axis(3)
 
         distance = math.sqrt(x_offset**2 + y_offset**2)
-        if distance > 0:
-            self.aim_direction = pygame.Vector2(x_offset / distance, y_offset/ distance)
+        
+        print(distance)
+        
+        if distance != 0:
+            self.aim_direction = pygame.Vector2(x_offset / distance, y_offset / distance)
         else:
             self.aim_direction = pygame.Vector2(0,0)
-        aim_cursor_position = (self.rect.x + self.aim_direction.x * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
-                               self.rect.y + self.aim_direction.y * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
-        pygame.draw.circle(screen, "white", aim_cursor_position, 4)
-    
-    def shoot(self, bullet_speed):
         
+        aim_cursor_position = (self.rect.x + x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
+                               self.rect.y + y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
+        pygame.draw.circle(screen, "white", aim_cursor_position, 4)
+        
+        print(x_offset, y_offset)
+
+        print(self.aim_direction)
+        
+    def shoot(self, bullet_speed):
         current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
