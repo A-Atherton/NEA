@@ -3,7 +3,7 @@ import pygame_widgets
 from pygame_widgets.button import Button
 import os
 import math
-#import random
+import random
 from pygame_widgets.textbox import TextBox
 
 
@@ -37,7 +37,7 @@ class Weapon(pygame.sprite.Sprite):
 #weapons
 class Ak47(Weapon):
     def __init__(self, position: pygame.Vector2) -> None:
-        super().__init__("ak47", True, 30, 0.1, "ak47.png", 30, position)
+        super().__init__("ak47", True, 30, 0.2, "ak47.png", 30, position)
 
 class Smg(Weapon): #Needs assets
     def __init__(self, position) -> None:
@@ -146,22 +146,41 @@ class Player(pygame.sprite.Sprite):
         self.facing()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
-        x_offset = self.controller.get_axis(2)
-        y_offset = self.controller.get_axis(3)
+        
+        right_x_offset = self.controller.get_axis(2)
+        right_y_offset = self.controller.get_axis(3)
+        
+        right_distance = math.sqrt(right_x_offset ** 2 + right_y_offset ** 2)
 
-        distance = math.sqrt(x_offset ** 2 + y_offset ** 2)
+        if right_distance > 0.1:
+            self.aim_direction = pygame.Vector2(right_x_offset / right_distance, right_y_offset/ right_distance)
 
-        if distance != 0:
-            self.aim_direction = pygame.Vector2(x_offset / distance, y_offset/ distance)
         else:
-            self.aim_direction = pygame.Vector2(0,0)
+            
+            left_x_offset = self.controller.get_axis(0)
+            left_y_offset = self.controller.get_axis(1)
+            left_distance = math.sqrt(left_x_offset ** 2 + left_y_offset ** 2)
 
-        aim_cursor_position = (self.rect.x + x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
-                               self.rect.y + y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
+            if left_distance > 0.1:
+                self.aim_direction = pygame.Vector2(left_x_offset / left_distance, left_y_offset/ left_distance)
+
+                
+            else:
+                random_x_offset = (2 * random.random()) - 1
+                random_y_offset = (2 * random.random()) - 1
+                
+                random_distance = math.sqrt(random_x_offset ** 2 + random_y_offset ** 2)
+                self.aim_direction = pygame.Vector2(random_x_offset / random_distance, random_y_offset/ random_distance)
+
+        
+
+
+        aim_cursor_position = (self.rect.x + right_x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
+                               self.rect.y + right_y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
     
     def shoot(self, bullet_speed):
-        print(self.aim_direction)
+    
         current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
@@ -175,7 +194,6 @@ class Player(pygame.sprite.Sprite):
     def facing(self):
         if self.direction.x > 0:
             True
-            print("flip", self.direction)
         else:
             self.flip = False
         self.image = pygame.transform.flip(pygame.image.load(os.path.abspath("assets/player/player.png")), self.flip, False)
@@ -209,6 +227,9 @@ class Level():
                     joystick_id += 1
                 if cell == "S":
                     self.spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
+                if cell == " ":
+                    pass
+                    #self.tile.add(Tile((x,y), self.tile_size, False, ))
                     
     def player_collision_check(self) -> None:
         for player in self.players.sprites():
@@ -222,18 +243,22 @@ class Level():
                             player.rect.right = tile.rect.left
                         elif player.direction.x < 0:
                             player.rect.left = tile.rect.right
-            
+
             #verticle check
             player.rect.y += player.direction.y
             for tile in self.tiles.sprites():
-                if tile.rect.colliderect(player.rect) and tile.collision == True:
+                if tile.rect.colliderect(player.rect):
                     if player.direction.y < 0:
                         player.rect.top = tile.rect.bottom
                         player.direction.y = 0
+                        
                     elif player.direction.y > 0:
                         player.rect.bottom = tile.rect.top
                         player.jump_counter = 1
                         player.direction.y = 0
+                        #player.jump_counter = 1
+                else:
+                        pass #player.jump_counter = 0
 
             #bullet check
             for bullet in self.bullets:
@@ -258,7 +283,6 @@ class Level():
             pass
            
     def run(self) -> None:
-
         self.players.update()
         self.bullets.update()
         self.spawners.update()
@@ -267,9 +291,9 @@ class Level():
         self.tiles.draw(self.display_surface)
         for player in self.players:
             player.get_aim_direction()
+        self.weapons.draw(self.display_surface)
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
-        self.weapons.draw(self.display_surface)
         self.spawners.draw(self.display_surface)
         
 
