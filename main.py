@@ -55,15 +55,16 @@ class Bullet(pygame.sprite.Sprite):
         self.image.fill((255, 187, 92))
         self.rect = self.image.get_rect(topleft = position)
         self.velocity = velocity
-        self.lifetime = 20
+        self.lifetime = 10000
         self.birth_time = pygame.time.get_ticks()
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
+        """
         if self.birth_time > self.lifetime:
             self.kill()
-        
+        """
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,position,joystick_id) -> None:
@@ -74,6 +75,7 @@ class Player(pygame.sprite.Sprite):
         self.controller = pygame.joystick.Joystick(joystick_id)
         self.aim_direction = pygame.Vector2(0,0)
         self.time_of_last_shot = 0
+        self.flip = False
 
         #movement
         self.speed = 6
@@ -129,7 +131,7 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         self.direction.y = self.jump_speed
         self.jump_counter -= 1
-    
+
     def update(self):
         self.get_input()
         self.apply_gravity()
@@ -140,29 +142,26 @@ class Player(pygame.sprite.Sprite):
                 self.holding = None
         if self.health <= 0:
             self.kill()
+        
+        self.facing()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         x_offset = self.controller.get_axis(2)
         y_offset = self.controller.get_axis(3)
 
-        distance = math.sqrt(x_offset**2 + y_offset**2)
-        
-        print(distance)
-        
+        distance = math.sqrt(x_offset ** 2 + y_offset ** 2)
+
         if distance != 0:
-            self.aim_direction = pygame.Vector2(x_offset / distance, y_offset / distance)
+            self.aim_direction = pygame.Vector2(x_offset / distance, y_offset/ distance)
         else:
             self.aim_direction = pygame.Vector2(0,0)
-        
+
         aim_cursor_position = (self.rect.x + x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
                                self.rect.y + y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
-        
-        print(x_offset, y_offset)
-
-        print(self.aim_direction)
-        
+    
     def shoot(self, bullet_speed):
+        print(self.aim_direction)
         current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
@@ -172,6 +171,15 @@ class Player(pygame.sprite.Sprite):
         
     def do_damage(self, damage_amount: int):
         self.health -= damage_amount
+
+    def facing(self):
+        if self.direction.x > 0:
+            True
+            print("flip", self.direction)
+        else:
+            self.flip = False
+        self.image = pygame.transform.flip(pygame.image.load(os.path.abspath("assets/player/player.png")), self.flip, False)
+
 
 
 class Level():
@@ -248,8 +256,7 @@ class Level():
         
         for tile in self.tiles:
             pass
-        
-    
+           
     def run(self) -> None:
 
         self.players.update()
