@@ -201,8 +201,8 @@ class Player(pygame.sprite.Sprite):
 
 
 class Level():
-    def __init__(self, layout, surface) -> None:
-        self.layout = layout
+    def __init__(self, layouts, surface) -> None:
+        self.layouts = layouts
         self.tile_size = 32
         self.display_surface = surface
         self.number_of_players = pygame.joystick.get_count()
@@ -215,7 +215,8 @@ class Level():
         self.weapons = pygame.sprite.Group()
         self.spawners = pygame.sprite.Group()
         joystick_id = 0
-        for row_index, row in enumerate(self.layout):
+        
+        for row_index, row in enumerate(self.layouts):
             for col_index, cell in enumerate(row):
                 x = col_index * self.tile_size
                 y = row_index * self.tile_size
