@@ -181,12 +181,12 @@ class Player(pygame.sprite.Sprite):
     
     def shoot(self, bullet_speed):
     
-        current_level.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
+        game.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
     def pick_up(self, weapon):
         self.holding = weapon
-        current_level.weapons.add(self.holding)
+        game.weapons.add(self.holding)
         
     def do_damage(self, damage_amount: int):
         self.health -= damage_amount
@@ -200,37 +200,38 @@ class Player(pygame.sprite.Sprite):
 
 
 
-class Level():
+class Game():
     def __init__(self, layouts, surface) -> None:
-        self.layouts = layouts
         self.tile_size = 32
         self.display_surface = surface
         self.number_of_players = pygame.joystick.get_count()
-        self.level_setup()
+        self.levels = []
+        self.level_setup(layouts)
+        self.current_level = self.levels[0]
 
-    def level_setup(self) -> None:
-        self.tiles = pygame.sprite.Group()
+    def level_setup(self, layouts) -> None:
         self.players = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.weapons = pygame.sprite.Group()
-        self.spawners = pygame.sprite.Group()
         joystick_id = 0
         
-        for row_index, row in enumerate(self.layouts):
-            for col_index, cell in enumerate(row):
-                x = col_index * self.tile_size
-                y = row_index * self.tile_size
-                if cell == "X":
-                    self.tiles.add(Tile((x,y),self.tile_size, True, "standard_tile.png"))
-                if cell == "P" and self.number_of_players > 0:
-                    self.players.add(Player((x,y), joystick_id))
-                    self.number_of_players -= 1
-                    joystick_id += 1
-                if cell == "S":
-                    self.spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
-                if cell == " ":
-                    pass
-                    #self.tile.add(Tile((x,y), self.tile_size, False, ))
+        for layout in layouts:
+            temp = Level()
+            self.levels.append(temp)
+            for row_index, row in enumerate(layout):
+                for col_index, cell in enumerate(row):
+                    x = col_index * self.tile_size
+                    y = row_index * self.tile_size
+                    if cell == "X":
+                        temp.tiles.add(Tile((x,y),self.tile_size, True, "standard_tile.png"))
+                    if cell == "P":
+                        Player_Spawner()
+                    if cell == "S":
+                        self.spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
+                    if cell == " ":
+                        pass
+                        #self.tile.add(Tile((x,y), self.tile_size, False, ))
+
                     
     def player_collision_check(self) -> None:
         for player in self.players.sprites():
@@ -286,17 +287,23 @@ class Level():
     def run(self) -> None:
         self.players.update()
         self.bullets.update()
-        self.spawners.update()
+        self.current_level.gun_spawners.update()
         self.player_collision_check()
         self.bullet_collision_check()
-        self.tiles.draw(self.display_surface)
+        self.current_level.tiles.draw(self.display_surface)
         for player in self.players:
             player.get_aim_direction()
         self.weapons.draw(self.display_surface)
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
-        self.spawners.draw(self.display_surface)
+        self.current_level.gun_spawners.draw(self.display_surface)
         
+class Level():
+    def __init__(self) -> None:
+        self.tiles = pygame.sprite.Group()
+        self.gun_spawners = pygame.sprite.Group()
+        self.player_spawners = pygame.sprite.Group()
+
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
@@ -316,27 +323,30 @@ class Gun_Spawner(Tile):
         
 
     def update(self):
-        if pygame.time.get_ticks() - self.time_of_last_spawn >= 10_000 and len(current_level.weapons) < WEAPON_CAP_AMOUNT:
+        if pygame.time.get_ticks() - self.time_of_last_spawn >= 10_000 and len(game.weapons) < WEAPON_CAP_AMOUNT:
             self.spawn_gun()
         
 
     def spawn_gun(self):
-        current_level.weapons.add(Ak47(pygame.Vector2(self.rect.x, self.rect.y)))
+        game.weapons.add(Ak47(pygame.Vector2(self.rect.x, self.rect.y)))
         self.time_of_last_spawn = pygame.time.get_ticks()
 
-
-levels_list = []
-
+class Player_Spawner(Tile):
+    def __init__(self) -> None:
+        pass
 
 def load_levels(surface):
+    levels_list = []
     with os.scandir('levels/') as entries:
         for entry in entries:
             level_layout = []
             with open(entry, 'r') as level:
                 for line in level:
                     level_layout.append(line.rstrip("\n"))                    
-            levels_list.append(Level(level_layout, surface))
-
+            levels_list.append(level_layout)
+    
+    global game
+    game = Game(level_layout, screen)
 
 #Pygame Setup
 pygame.init()
@@ -345,7 +355,6 @@ clock = pygame.time.Clock()
 running = True
 background = pygame.image.load(os.path.abspath("assets/background/Background.png"))
 load_levels(screen)
-current_level_counter = 0
 
 #Main loop
 while running:
@@ -355,19 +364,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:
-                current_level_counter += 1
-            if event.key == pygame.K_0:
-                for player in current_level.players:
-                    player.pick_up()
-
+            pass
     pygame_widgets.update(events)
 
     #Render
     screen.blit(background, (0,0))
-
-    current_level = levels_list[current_level_counter % len(levels_list)]
-    current_level.run()
+    game.run()
     
     pygame.display.flip()
 
