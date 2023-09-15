@@ -303,6 +303,14 @@ class Game():
     def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
         pass    
 
+    def next_level(self):
+        self.current_level_counter += 1
+        self.current_level = game.levels[game.current_level_counter % len(game.levels)]
+        for weapon in self.weapons.sprites():
+            weapon.kill()
+        for bullet in self.bullets.sprites():
+            bullet.kill()
+        #self.players.hide()
 
 class Level():
     def __init__(self) -> None:
@@ -370,10 +378,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.type == pygame.K_p:
-                game.current_level_counter += 1
-                game.current_level = game.levels[game.current_level_counter]
-                print("keydown")
+            if event.key == pygame.K_p:
+                game.next_level()
+                
 
     
     pygame_widgets.update(events)
