@@ -207,7 +207,9 @@ class Game():
         self.number_of_players = pygame.joystick.get_count()
         self.levels = []
         self.level_setup(layouts)
-        self.current_level = self.levels[0]
+        self.current_level_counter = 0
+        self.current_level = self.levels[self.current_level_counter]
+        
 
     def level_setup(self, layouts) -> None:
         self.players = pygame.sprite.Group()
@@ -227,7 +229,7 @@ class Game():
                     if cell == "P":
                         Player_Spawner()
                     if cell == "S":
-                        self.spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
+                        temp.gun_spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
                     if cell == " ":
                         pass
                         #self.tile.add(Tile((x,y), self.tile_size, False, ))
@@ -297,7 +299,11 @@ class Game():
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
         self.current_level.gun_spawners.draw(self.display_surface)
-        
+
+    def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
+        pass    
+
+
 class Level():
     def __init__(self) -> None:
         self.tiles = pygame.sprite.Group()
@@ -346,7 +352,7 @@ def load_levels(surface):
             levels_list.append(level_layout)
     
     global game
-    game = Game(level_layout, screen)
+    game = Game(levels_list, screen)
 
 #Pygame Setup
 pygame.init()
@@ -364,7 +370,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            pass
+            if event.type == pygame.K_p:
+                game.current_level_counter += 1
+                game.current_level = game.levels[game.current_level_counter]
+                print("keydown")
+
+    
     pygame_widgets.update(events)
 
     #Render

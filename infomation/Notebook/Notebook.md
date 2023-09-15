@@ -135,4 +135,43 @@ and created a new method to add gravity
 
 ![Alt text](<Screenshot from 2023-07-11 16-07-02.png>)
 ![Alt text](<Screenshot 2023-07-27 at 15.09.45.png>) 
+
 I fixed this by adding half the width and half the hight of the player onto the position of the circle. 
+
+I changed the system used for aiming:
+![Alt text](<Screen Shot 2023-09-07 at 15.00.52.png>)
+
+
+I changed the system i was using so that all levels are stored in the game class.
+
+This means that the game class stores the players so the players are the same objects for all levels. This is a better method than before
+
+to do this I changed the layout of the method in the game class (formerly the level class). The level layouts are passed into the game class and these are turned into a group of tiles stored in the gun_spawners, players_spawners and tiles groups in the Level class
+
+![Alt text](<Screen Shot 2023-09-14 at 14.52.20.png>)
+
+![Alt text](<Screen Shot 2023-09-14 at 14.52.32.png>)
+
+After restructuring I found that the levels were not displaying properly
+
+![Alt text](<Screen Shot 2023-09-15 at 11.46.22.png>)
+
+to investigate further and for later testing i added a key which increases a counter which decides what level will be displayed
+
+![Alt text](<Screen Shot 2023-09-15 at 11.45.20.png>)
+
+this did not work so i printed the layouts that were being passed to the game object on intialization which showed that only one level was being passed to the game object. On inspection of the function to pass the level to the game i noticed that only the wrong variable was being passed and only one level was stored in that variable. This resulted in a broken looking game.
+
+![Alt text](<Screen Shot 2023-09-15 at 11.46.44.png>)
+
+i fixed this by changing the variable being passed to the correct 2D array of strings instead of the 1D array of strings that was being passed in before.
+
+![Alt text](<Screen Shot 2023-09-15 at 11.45.39.png>)
+
+after some debugging of some simple bugs I got the game working as it was before. I also removed the print to keep the console clean. 
+
+![Alt text](<Screen Shot 2023-09-15 at 11.59.11.png>)
+
+Next i needed to add a new method of spawning players as before they were spawned on initialization of the level. This time a new method will be needed because each player object is not stored in each level
+
+The new method will run at the initialization of the game object and will check the amount of controllers connected and...
