@@ -174,4 +174,6 @@ after some debugging of some simple bugs I got the game working as it was before
 
 Next i needed to add a new method of spawning players as before they were spawned on initialization of the level. This time a new method will be needed because each player object is not stored in each level
 
-The new method will run at the initialization of the game object and will check the amount of controllers connected and...
+The new method will run at the initialization of the game object. When the player presses the "start" button on the controller or the "E" key on the keyboard (keyboard support will be added later) a new player will be initiated. While the game is running if a the start button is pressed on a new controller (or its pressed on the keyboard) a new player will be intialised and will be spawned in the next level.
+
+
