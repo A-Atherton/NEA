@@ -172,15 +172,11 @@ class Player(pygame.sprite.Sprite):
                 random_distance = math.sqrt(random_x_offset ** 2 + random_y_offset ** 2)
                 self.aim_direction = pygame.Vector2(random_x_offset / random_distance, random_y_offset/ random_distance)
 
-        
-
-
         aim_cursor_position = (self.rect.x + right_x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
                                self.rect.y + right_y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
         pygame.draw.circle(screen, "white", aim_cursor_position, 4)
     
     def shoot(self, bullet_speed):
-    
         game.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
@@ -210,7 +206,6 @@ class Game():
         self.current_level_counter = 0
         self.current_level = self.levels[self.current_level_counter]
         
-
     def level_setup(self, layouts) -> None:
         self.players = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
@@ -233,8 +228,7 @@ class Game():
                     if cell == " ":
                         pass
                         #self.tile.add(Tile((x,y), self.tile_size, False, ))
-
-                    
+                   
     def player_collision_check(self) -> None:
         for player in self.players.sprites():
 
@@ -301,7 +295,8 @@ class Game():
         self.current_level.gun_spawners.draw(self.display_surface)
 
     def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
-        pass    
+        for joystick in pygame.joystick.
+
 
     def next_level(self):
         self.current_level_counter += 1

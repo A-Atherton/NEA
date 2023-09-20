@@ -172,6 +172,11 @@ after some debugging of some simple bugs I got the game working as it was before
 
 ![Alt text](<Screen Shot 2023-09-15 at 11.59.11.png>)
 
-Next i needed to add a new method of spawning players as before they were spawned on initialization of the level. This time a new method will be needed because each player object is not stored in each level
+I set the key for next level to be "p" and it calls a method from the Game class which first updates the current_level_counter. It changes the current_level to be the next level in the list. It then kills the bullets and the weapons and will "spawn" the players in the correct place.
+
+![Alt text](<Screen Shot 2023-09-15 at 13.58.30.png>)
+
+Next i needed to add a new way of spawning players as before they were spawned on initialization of the level. This time a new method will be needed because each player object is not stored in each level
 
 The new method will run at the initialization of the game object and will check the amount of controllers connected and...
+
