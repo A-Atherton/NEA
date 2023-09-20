@@ -234,7 +234,7 @@ class Game():
 
             #horizontal check
             player.rect.x += player.direction.x
-            for tile in self.tiles.sprites():
+            for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
                     if tile.collision == True:    
                         if player.direction.x > 0:
@@ -244,7 +244,7 @@ class Game():
 
             #verticle check
             player.rect.y += player.direction.y
-            for tile in self.tiles.sprites():
+            for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
                     if player.direction.y < 0:
                         player.rect.top = tile.rect.bottom
@@ -271,13 +271,13 @@ class Game():
 
     def bullet_collision_check(self) -> None: #kills the bullet if it hits a solid tile
         for bullet in self.bullets.sprites():
-            for tile in self.tiles.sprites():
+            for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
                     bullet.kill()
         
     def weapon_collision_check(self) -> None:
         
-        for tile in self.tiles:
+        for tile in self.current_level.tiles:
             pass
            
     def run(self) -> None:
@@ -293,9 +293,14 @@ class Game():
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
         self.current_level.gun_spawners.draw(self.display_surface)
+        self.check_for_players()
 
     def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
-        for joystick in pygame.joystick.
+        joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+        print(joysticks)
+        for joystick in joysticks:
+            if joystick.get_button(4):
+                self.players.add(Player((100,100), 1))
 
 
     def next_level(self):
