@@ -67,14 +67,15 @@ class Bullet(pygame.sprite.Sprite):
         """
 
 class Player(pygame.sprite.Sprite):
-    def __init__( self, position, controller_player, controller_id=0 ) -> None:
+    def __init__( self, position, controller_player, joystick=None ) -> None:
         super().__init__()
         self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.rect = self.image.get_rect(topleft = position)
         self.direction = pygame.Vector2(0,0)
         self.controller_player = controller_player
         if controller_player:
-            self.controller = pygame.joystick.Joystick(controller_id)
+            self.controller = joystick
+            print("controller asigned")
         self.aim_direction = pygame.Vector2(0,0)
         self.time_of_last_shot = 0 
         self.flip = False
@@ -303,13 +304,15 @@ class Game():
         self.check_for_players()
 
     def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
-        for joystick in joysticks.values():
-            if joystick.get_button(0):
-                self.players.add(Player((100,100), True, 0))
+        for joy_itr in joysticks:
+            if joy_itr.joystick.get_button(0):
+                print("button pressed")
+        
         if pygame.key.get_pressed()[pygame.K_e] and self.keyboard_player_spawned == False:
             self.players.add(Player((100,100), False))
             self.keyboard_player_spawned = True
-
+            print("keyboard player added")
+        
     def next_level(self):
         self.current_level_counter += 1
         self.current_level = game.levels[game.current_level_counter % len(game.levels)]
@@ -356,6 +359,11 @@ class Player_Spawner(Tile):
     def __init__(self) -> None:
         self.used = False
 
+class Joystick_Class():
+    def __init__(self, joystick) -> None:
+        self.joystick = joysticks
+        self.spawned = False
+
 def load_levels(surface):
     levels_list = []
     with os.scandir('levels/') as entries:
@@ -376,8 +384,7 @@ clock = pygame.time.Clock()
 running = True
 background = pygame.image.load(os.path.abspath("assets/background/Background.png"))
 load_levels(screen)
-
-joysticks = {}
+joysticks = []
 
 #Main loop
 while running:
@@ -394,8 +401,9 @@ while running:
                 # This event will be generated when the program starts for every
                 # joystick, filling up the list without needing to create them manually.
                 joy = pygame.joystick.Joystick(event.device_index)
-                joysticks[joy.get_instance_id()] = joy
-                print(joysticks)
+                joysticks.append(Joystick_Class(joy))
+                print("Joystick connected")
+                game.players.add(Player((100,100), True, joystick=joy))
                 
 
     

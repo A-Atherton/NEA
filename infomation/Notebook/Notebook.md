@@ -182,3 +182,16 @@ Next i needed to add a new way of spawning players as before they were spawned o
 The new method will run at the initialization of the game object. When the player presses the "start" button on the controller or the "E" key on the keyboard (keyboard support will be added later) a new player will be initiated. While the game is running if a the start button is pressed on a new controller (or its pressed on the keyboard) a new player will be intialised and will be spawned in the next level.
 
 
+to start I created a function that checks for a couple of inputs ("e" and button "A" on a controller) and spawns in a player if one of these is pressed
+
+![Alt text](<Screen Shot 2023-09-21 at 12.56.22.png>)
+
+This worked for a quick test:
+
+https://drive.google.com/file/d/11PVkdxy5DVjoaSnns7CypnW7Pe5-l2Tl/view?usp=drive_link
+
+This results in many players being added for every frame that "e" is held down.
+
+I fixed this by creating a boolean called keyboard_player_spawned. When the "e" key is pressed the boolean is set to true so next time the key is pressed a keyboard player is not spawned.
+
+I attempted to do the same with the controllers by using a list of connected controllers and 

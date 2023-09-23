@@ -49,6 +49,7 @@ def main():
         # Event processing step.
         # Possible joystick events: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN,
         # JOYBUTTONUP, JOYHATMOTION, JOYDEVICEADDED, JOYDEVICEREMOVED
+        s
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True  # Flag that we are done so we exit this loop.
@@ -68,6 +69,7 @@ def main():
                 # This event will be generated when the program starts for every
                 # joystick, filling up the list without needing to create them manually.
                 joy = pygame.joystick.Joystick(event.device_index)
+                print(event.device_index)
                 joysticks[joy.get_instance_id()] = joy
                 print(f"Joystick {joy.get_instance_id()} connencted")
 
@@ -148,4 +150,5 @@ if __name__ == "__main__":
     main()
     # If you forget this line, the program will 'hang'
     # on exit if running from IDLE.
+    print()
     pygame.quit
