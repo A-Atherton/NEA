@@ -121,28 +121,29 @@ Added controllers which will be the primary method of playing the game.
 
 ![Alt text](<Screenshot 2023-07-27 at 15.02.48.png>)
 
-Added circles to show where the players are aiming with the right joystick of a controller
+I added circles to show where the players are aiming with the right joystick of a controller. These circles just show the position of the right joystick (a  tuple of two floats between -1 and 1 representing the position of the joystick) times by a constant.
 
 Here is the code that does that.
 ![Alt text](<Screenshot 2023-07-27 at 14.57.43.png>)
 
-this code uses the top left of the player as the centre of the aiming circle which doesnt look right
-Used pygame_widgets to do some tests
+this code uses the top left of the player as the centre of the aiming circle which doesnt look right so I changed it by adding half the width and half the hight of the player onto the position of the circle. 
 
-![Alt text](<Screenshot from 2023-07-11 16-06-40.png>)
-
-and created a new method to add gravity
-
-![Alt text](<Screenshot from 2023-07-11 16-07-02.png>)
 ![Alt text](<Screenshot 2023-07-27 at 15.09.45.png>) 
 
-I fixed this by adding half the width and half the hight of the player onto the position of the circle. 
+Also another problem is that depending on the where the player is aiming the speed of the bullets will differ. This results in some bullets being slower than others by large amounts which is not realistic and affects gameplay.
 
-I changed the system used for aiming:
+To remedy this I changed the system used for aiming:
+
+I set the direction of aiming to be a normalized version of the position of the right joystick. This however does not work when the player is not pushing the right joystick. If the player is barely pushing or not pushing the joystick the joystick then the position of the left joystick (the one used for moving) will be used for the direction of shooting. If this is close to zero too then the aim direction will be set to a random direction.
+
+
 ![Alt text](<Screen Shot 2023-09-07 at 15.00.52.png>)
 
+This works ok for now but soon I will change it to store the last direction that the player aimed to be where to shoot. 
 
-I changed the system i was using so that all levels are stored in the game class.
+
+
+I made a large change to the system I was using so that all levels are stored in the game class.
 
 This means that the game class stores the players so the players are the same objects for all levels. This is a better method than before
 

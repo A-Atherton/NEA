@@ -335,8 +335,9 @@ class Game():
                 print("button pressed")
         """
         
-        if pygame.key.get_pressed()[pygame.K_e] and self.keyboard_player_spawned == False:
-            self.players.add(Pladpawned = True
+        if pygame.key.get_pressed()[pygame.K_e] and not self.keyboard_player_spawned:
+            self.players.add(Player((100,100), False))
+            self.keyboard_player_spawned = True
             print("Keyboard player added")
         
     def next_level(self):
@@ -349,6 +350,7 @@ class Game():
         #self.players.hide()
         for player in self.players:
             player.spawned = False
+            player.holding = None
         for spawner in self.current_level.player_spawners:
             spawner.used = False
         self.spawn_players()
@@ -397,6 +399,7 @@ class Gun_Spawner(Tile):
     def spawn_gun(self):
         game.weapons.add(Ak47(pygame.Vector2(self.rect.x, self.rect.y)))
         self.time_of_last_spawn = pygame.time.get_ticks()
+
 
 class Player_Spawner(Tile):
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
