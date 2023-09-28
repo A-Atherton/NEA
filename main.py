@@ -75,10 +75,12 @@ class Player(pygame.sprite.Sprite):
         self.controller_player = controller_player
         if controller_player:
             self.controller = joystick
-            print("controller asigned")
+
         self.aim_direction = pygame.Vector2(0,0)
         self.time_of_last_shot = 0 
         self.flip = False
+        self.spawned = False
+        self.dead = False
 
         #movement
         self.speed = 6
@@ -91,7 +93,9 @@ class Player(pygame.sprite.Sprite):
         self.holding = None
     
     def get_input(self):
-
+        
+        time_since_last_shot = pygame.time.get_ticks()- self.time_of_last_shot
+        
         #controller
         if self.controller_player:
             if self.controller.get_button(0) and self.jump_counter > 0: #A
@@ -109,10 +113,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.direction.x = 0
 
-            #shooting
-
-            time_since_last_shot = pygame.time.get_ticks()- self.time_of_last_shot 
-
+            #shooting 
             if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0 and time_since_last_shot > self.holding.firerate * 1000:
                 self.shoot(self.holding.bullet_speed)
                 self.holding.ammo_in_weapon -= 1
@@ -121,15 +122,22 @@ class Player(pygame.sprite.Sprite):
         #keyboard player
         else:       
             keys = pygame.key.get_pressed()
-            
-            if keys[pygame.K_d]:
+            clicks = pygame.mouse.get_pressed(num_buttons=3)
+            if keys[pygame.K_d]: #move right
                 self.direction.x = self.speed
-            elif keys[pygame.K_a]:
+            elif keys[pygame.K_a]: #move left
                 self.direction.x = -self.speed
             else:
                 self.direction.x = 0
-            if keys[pygame.K_w] and self.jump_counter > 0:
+            if keys[pygame.K_w] and self.jump_counter > 0: #jump
                 self.jump()
+            if keys[pygame.K_f]: #drop weapon 
+                self.holding = None
+            #shooting
+            if clicks[0] and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0 and time_since_last_shot > self.holding.firerate * 1000:
+                self.shoot(self.holding.bullet_speed)
+                self.holding.ammo_in_weapon -= 1
+                self.time_of_last_shot = pygame.time.get_ticks()
         
     def apply_gravity(self):
         self.direction.y += self.gravity
@@ -147,12 +155,12 @@ class Player(pygame.sprite.Sprite):
                 self.holding.kill()
                 self.holding = None
         if self.health <= 0:
-            self.kill()
+            self.dead = True
         
         self.facing()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
-        if self.controller_player:
+        if self.controller_player: #controller player
             right_x_offset = self.controller.get_axis(2)
             right_y_offset = self.controller.get_axis(3)
             
@@ -181,7 +189,23 @@ class Player(pygame.sprite.Sprite):
             aim_cursor_position = (self.rect.x + right_x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
                                 self.rect.y + right_y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
             pygame.draw.circle(screen, "white", aim_cursor_position, 4)
-
+            
+        else: #keyboard player
+            mouse_pos = pygame.mouse.get_pos()
+            
+            mouse_offset_from_player = (mouse_pos[0] - self.rect.x, mouse_pos[1] - self.rect.y)
+            
+            mouse_distance_from_player = math.sqrt(mouse_offset_from_player[0] ** 2 + mouse_offset_from_player[1] ** 2)
+            
+            if mouse_distance_from_player > 0:
+                self.aim_direction = pygame.Vector2(mouse_offset_from_player[0] / mouse_distance_from_player, mouse_offset_from_player[1]/ mouse_distance_from_player)
+            if mouse_distance_from_player > AIM_INDICATOR_DISTANCE_FROM_PLAYER:
+                aim_cursor_position = (self.rect.x + self.aim_direction.x * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
+                                    self.rect.y + self.aim_direction.y * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
+            else: 
+                aim_cursor_position = (self.rect.x + mouse_offset_from_player[0] + 10,
+                                    self.rect.y + mouse_offset_from_player[1] + 16)
+            pygame.draw.circle(screen, "white", aim_cursor_position, 4)        
         
     def shoot(self, bullet_speed):
         game.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
@@ -215,6 +239,7 @@ class Game():
         self.keyboard_player_spawned = False
         
     def level_setup(self, layouts) -> None:
+        #self.player_que = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.weapons = pygame.sprite.Group()
@@ -230,7 +255,7 @@ class Game():
                     if cell == "X":
                         temp.tiles.add(Tile((x,y),self.tile_size, True, "standard_tile.png"))
                     if cell == "P":
-                        Player_Spawner()
+                        temp.player_spawners.add(Player_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
                     if cell == "S":
                         temp.gun_spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
                     if cell == " ":
@@ -304,14 +329,15 @@ class Game():
         self.check_for_players()
 
     def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
+        """
         for joy_itr in joysticks:
             if joy_itr.joystick.get_button(0):
                 print("button pressed")
+        """
         
         if pygame.key.get_pressed()[pygame.K_e] and self.keyboard_player_spawned == False:
-            self.players.add(Player((100,100), False))
-            self.keyboard_player_spawned = True
-            print("keyboard player added")
+            self.players.add(Pladpawned = True
+            print("Keyboard player added")
         
     def next_level(self):
         self.current_level_counter += 1
@@ -321,7 +347,26 @@ class Game():
         for bullet in self.bullets.sprites():
             bullet.kill()
         #self.players.hide()
+        for player in self.players:
+            player.spawned = False
+        for spawner in self.current_level.player_spawners:
+            spawner.used = False
+        self.spawn_players()
 
+    def spawn_players(self):
+        for i, player in enumerate(self.players.sprites()):
+            if not player.spawned:
+
+                for spawner in self.current_level.player_spawners.sprites():
+
+                    if not spawner.used:
+                        player.rect.topleft = spawner.rect.topleft
+
+                        spawner.used = True
+                        break
+                        
+                
+        
 class Level():
     def __init__(self) -> None:
         self.tiles = pygame.sprite.Group()
@@ -345,24 +390,25 @@ class Gun_Spawner(Tile):
         super().__init__(position, size, collision, asset_path)
         self.time_of_last_spawn = 0
         
-
     def update(self):
         if pygame.time.get_ticks() - self.time_of_last_spawn >= 10_000 and len(game.weapons) < WEAPON_CAP_AMOUNT:
             self.spawn_gun()
         
-
     def spawn_gun(self):
         game.weapons.add(Ak47(pygame.Vector2(self.rect.x, self.rect.y)))
         self.time_of_last_spawn = pygame.time.get_ticks()
 
 class Player_Spawner(Tile):
-    def __init__(self) -> None:
+    def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
+        super().__init__(position, size, collision, asset_path)
         self.used = False
+        
 
 class Joystick_Class():
     def __init__(self, joystick) -> None:
         self.joystick = joysticks
         self.spawned = False
+
 
 def load_levels(surface):
     levels_list = []
@@ -382,6 +428,7 @@ pygame.init()
 screen = pygame.display.set_mode((1024,576))
 clock = pygame.time.Clock()
 running = True
+pygame.mouse.set_visible(True)
 background = pygame.image.load(os.path.abspath("assets/background/Background.png"))
 load_levels(screen)
 joysticks = []

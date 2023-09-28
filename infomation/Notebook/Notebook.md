@@ -194,4 +194,32 @@ This results in many players being added for every frame that "e" is held down.
 
 I fixed this by creating a boolean called keyboard_player_spawned. When the "e" key is pressed the boolean is set to true so next time the key is pressed a keyboard player is not spawned.
 
-I attempted to do the same with the controllers by using a list of connected controllers and 
+I attempted to do the same with the controllers by using a of objects that stored the joystick object and a bool representing whether the joystick had been asigned to a controller. This did not work as pygame created may have a bug which caused it to create a list within the class which stored the class which stored the list... I am not sure how to fix this currently.
+
+I added a function which spawns all the players in an appropriate spawning platform. This works for one player but the second third ... does not work. 
+
+![Alt text](player_spawning_code.png)
+
+
+I added some code that draws an aim indicator for a keyboard player. I also hid the mouse in the hopes that this would balance the keyboard and controller players.
+
+![Alt text](keyboard_aim_code.png)
+
+first the mouse position is recorded then the position of the mouse relative to the player is recorded. The distance between the mouse and the player is recorded and the direction is found by "normalizing" the position relative to the mouse by dividing the relative position by the distance. to draw the aiming indicator circle thing I draw it depending on distance from the player if close or cap it at an amount. not sure if i will continue it in this method as it makes gameplay strange.
+
+https://drive.google.com/file/d/1JNfhI7j8WD1jIEACEOWy0d4Jf1nMZzS2/view?usp=drive_link
+
+It works but sometimes the mouse comes out of the side of the window which means the player cannot shoot or aim. This should be fixed.
+
+
+
+I added code to shoot the weapon as well. This means that the game is playable on the keyboard and mouse.
+
+![Alt text](keyboard_player_code.png)
+
+the result of which can be seen in the previous video
+
+
+
+
+
