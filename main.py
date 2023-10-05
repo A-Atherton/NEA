@@ -13,7 +13,9 @@ AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
 OFFSET_OF_GUN_FROM_PLAYER = pygame.Vector2(0,0)
 WEAPON_CAP_AMOUNT = 6
 WEAPON_SPAWN_RATE_IN_MILLIS = 10_000
-
+PLAYER_ACCELERATION_RATE = 0.38
+PLAYER_FRICTION = 0.1
+PLAYER_MAX_VELOCITY = 5
 
 class Weapon(pygame.sprite.Sprite):
     def __init__( self, name: str, shoot: bool, ammo: int, firerate: float, asset_path: str, bullet_speed: int, position:pygame.Vector2) -> None:
@@ -71,12 +73,13 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.rect = self.image.get_rect(topleft = position)
-        self.direction = pygame.Vector2(0,0)
+        self.velocity = pygame.Vector2(0,0)
+        self.acceleration = pygame.Vector2(0,0)
         self.controller_player = controller_player
         if controller_player:
             self.controller = joystick
 
-        self.aim_direction = pygame.Vector2(0,0)
+        self.aim_velocity = pygame.Vector2(0,0)
         self.time_of_last_shot = 0 
         self.flip = False
         self.spawned = False
@@ -107,11 +110,12 @@ class Player(pygame.sprite.Sprite):
             if self.controller.get_button(3): #Y
                 self.holding = None
 
-            if self.controller.get_axis(0) > 0.2 or self.controller.get_axis(0) < -0.2: #x movement
-                self.direction.x = self.speed * self.controller.get_axis(0)
+            if self.controller.get_axis(0) > 0.2 or self.controller.get_axis(0) < -0.2:
+                 #x movement
+                self.acceleration.x = PLAYER_ACCELERATION_RATE * self.controller.get_axis(0)
             
             else:
-                self.direction.x = 0
+                self.velocity.x = 0
 
             #shooting 
             if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0 and time_since_last_shot > self.holding.firerate * 1000:
@@ -124,11 +128,11 @@ class Player(pygame.sprite.Sprite):
             keys = pygame.key.get_pressed()
             clicks = pygame.mouse.get_pressed(num_buttons=3)
             if keys[pygame.K_d]: #move right
-                self.direction.x = self.speed
+                self.acceleration.x = PLAYER_ACCELERATION_RATE
             elif keys[pygame.K_a]: #move left
-                self.direction.x = -self.speed
+                self.acceleration.x = -PLAYER_ACCELERATION_RATE
             else:
-                self.direction.x = 0
+                self.velocity.x = 0
             if keys[pygame.K_w] and self.jump_counter > 0: #jump
                 self.jump()
             if keys[pygame.K_f]: #drop weapon 
@@ -140,10 +144,10 @@ class Player(pygame.sprite.Sprite):
                 self.time_of_last_shot = pygame.time.get_ticks()
         
     def apply_gravity(self):
-        self.direction.y += self.gravity
+        self.velocity.y += self.gravity
 
     def jump(self):
-        self.direction.y = self.jump_speed
+        self.velocity.y = self.jump_speed
         self.jump_counter -= 1
 
     def update(self):
@@ -219,7 +223,7 @@ class Player(pygame.sprite.Sprite):
         self.health -= damage_amount
 
     def facing(self):
-        if self.direction.x > 0:
+        if self.velocity.x > 0:
             True
         else:
             self.flip = False
@@ -262,31 +266,38 @@ class Game():
                         pass
                         #self.tile.add(Tile((x,y), self.tile_size, False, ))
                    
-    def player_collision_check(self) -> None:
+    def player_collision_check(self,dt) -> None:
         for player in self.players.sprites():
 
             #horizontal check
-            player.rect.x += player.direction.x
+            player.acceleration.x += player.velocity.x * PLAYER_FRICTION
+            player.velocity.x += player.acceleration.x * dt
+            print(player.velocity)
+            player.velocity.x = max(-PLAYER_MAX_VELOCITY, min(player.velocity.x, PLAYER_ACCELERATION_RATE))
+            print(player.velocity)
+            if abs(player.velocity.x) < .01: player.velocity.x = 0
+            player.rect.x += player.velocity.x * dt + (player.acceleration.x * .5) * (dt * dt)
+            
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
-                    if tile.collision == True:    
-                        if player.direction.x > 0:
+                    if tile.collision == True:
+                        if player.velocity.x > 0:
                             player.rect.right = tile.rect.left
-                        elif player.direction.x < 0:
+                        elif player.velocity.x < 0:
                             player.rect.left = tile.rect.right
 
             #verticle check
-            player.rect.y += player.direction.y
+            player.rect.y += player.velocity.y
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
-                    if player.direction.y < 0:
+                    if player.velocity.y < 0:
                         player.rect.top = tile.rect.bottom
-                        player.direction.y = 0
+                        player.velocity.y = 0
                         
-                    elif player.direction.y > 0:
+                    elif player.velocity.y > 0:
                         player.rect.bottom = tile.rect.top
                         player.jump_counter = 1
-                        player.direction.y = 0
+                        player.velocity.y = 0
                         #player.jump_counter = 1
                 else:
                         pass #player.jump_counter = 0
@@ -302,7 +313,7 @@ class Game():
                     if weapon.rect.colliderect(player.rect):
                         player.holding = weapon
 
-    def bullet_collision_check(self) -> None: #kills the bullet if it hits a solid tile
+    def bullet_collision_check(self,dt) -> None: #kills the bullet if it hits a solid tile
         for bullet in self.bullets.sprites():
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
@@ -314,11 +325,12 @@ class Game():
             pass
            
     def run(self) -> None:
+        dt = clock.tick(60)*0.001*FRAMERATE
         self.players.update()
         self.bullets.update()
         self.current_level.gun_spawners.update()
-        self.player_collision_check()
-        self.bullet_collision_check()
+        self.player_collision_check(dt)
+        self.bullet_collision_check(dt)
         self.current_level.tiles.draw(self.display_surface)
         for player in self.players:
             player.get_aim_direction()
@@ -426,9 +438,10 @@ def load_levels(surface):
     global game
     game = Game(levels_list, screen)
 
+
 #Pygame Setup
 pygame.init()
-screen = pygame.display.set_mode((1024,576))
+screen = pygame.display.set_mode((1024,576), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 pygame.mouse.set_visible(True)

@@ -220,7 +220,11 @@ I added code to shoot the weapon as well. This means that the game is playable o
 
 the result of which can be seen in the previous video
 
+Researching other games implementation of bullets.
 
+https://drive.google.com/file/d/1vr3FaL602TrOZvsS-QuLlm39uO1xPzab/view?usp=drive_link - (The video is best viewed at .25 speed by pressing on the cog in bottom right)
 
+In stick fight a game that has many of the features that i want in my game. The bullets are large yellow cone shapes that move quickly. The bullets size depend on the gun they were fired with. Currentlly bullets are simple 5 by 5 squres that detect whether they collide with an object each frame
 
+Changing physics system to be more realistic and feal more realistic in the game. 
 
