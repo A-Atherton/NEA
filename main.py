@@ -266,7 +266,7 @@ class Game():
         for player in self.players.sprites():
 
             #horizontal check
-            player.rect.x += player.direction.x
+            player.rect.x = player.direction.x + 0.
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
                     if tile.collision == True:    
@@ -336,7 +336,8 @@ class Game():
         """
         
         if pygame.key.get_pressed()[pygame.K_e] and self.keyboard_player_spawned == False:
-            self.players.add(Pladpawned = True
+            self.players.add(Player((100,100), False))
+            self.keyboard_player_spawned = True
             print("Keyboard player added")
         
     def next_level(self):
@@ -419,9 +420,11 @@ def load_levels(surface):
                 for line in level:
                     level_layout.append(line.rstrip("\n"))                    
             levels_list.append(level_layout)
-    
     global game
     game = Game(levels_list, screen)
+
+def start_screen():
+    pass
 
 #Pygame Setup
 pygame.init()
