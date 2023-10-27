@@ -1,10 +1,15 @@
-import pygame
+from dependencies import *
+from constants import *
 from level import Level
+from spawners import Gun_Spawner, Player_Spawner
+from tile import Tile
+from player import Player
 
 class Game():
-    def __init__(self, layouts, surface) -> None:
+    def __init__(self, layouts, surface, clock) -> None:
         self.tile_size = 32
         self.display_surface = surface
+        self.clock = clock
         self.number_of_players = pygame.joystick.get_count()
         self.levels = []
         self.level_setup(layouts)
@@ -95,7 +100,7 @@ class Game():
             pass
            
     def run(self) -> None:
-        dt = clock.tick(60)*0.001*FRAMERATE
+        dt = self.clock.tick(60)*0.001*FRAMERATE
         self.players.update()
         self.bullets.update()
         self.current_level.gun_spawners.update()
@@ -124,7 +129,7 @@ class Game():
         
     def next_level(self):
         self.current_level_counter += 1
-        self.current_level = game.levels[game.current_level_counter % len(game.levels)]
+        self.current_level = self.levels[self.current_level_counter % len(self.levels)]
         for weapon in self.weapons.sprites():
             weapon.kill()
         for bullet in self.bullets.sprites():

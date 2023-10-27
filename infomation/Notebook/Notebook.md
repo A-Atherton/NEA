@@ -226,5 +226,8 @@ https://drive.google.com/file/d/1vr3FaL602TrOZvsS-QuLlm39uO1xPzab/view?usp=drive
 
 In stick fight a game that has many of the features that i want in my game. The bullets are large yellow cone shapes that move quickly. The bullets size depend on the gun they were fired with. Currentlly bullets are simple 5 by 5 squres that detect whether they collide with an object each frame
 
-Changing physics system to be more realistic and feal more realistic in the game. 
+Changing physics system for players to be more realistic and feal more realistic in the game. To do this I used a variable called acceleration. I also used some equations to apply these. I tested this but something was not right. When pressing a joystick the player flew into the distance at very high speeds. **needs more and screen shots**
+
+
+I started restructuring my code to be separated into different files then importing the require parts of the game into the required places. Whilst doing this I found I wanted my code to use composition rather than aggregation for components such as the players. Players only need to be linked one game as one player will not be in two different games. 
 

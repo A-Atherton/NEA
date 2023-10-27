@@ -15,7 +15,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y += self.velocity[1]
         
         current_time = pygame.time.get_ticks()
-        if self.birth_time - current_time > self.lifetime:
-            self.kill()
+        if self.birth_time - current_time > self.lifetime: # kills the bullet after 10 seconds which avoids
+            self.kill()                                     
         
       
