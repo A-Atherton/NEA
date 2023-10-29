@@ -31,6 +31,19 @@ My teacher is also a stakeholder. They need the game to be completed within a ti
 
 ### **Research and Identification of Solutions to the problem**
 
+#### **Questionare**
+
+I sent a questionare to the target audience (computer science classmates as they play lots of games which makes them good judges of what makes a good game). I used google forms as it is an efficient method of creating forms and gathering responses.
+In total I got 5 responses. The data showed:
+
+2/5 played games on a pc
+2/5 played games on a laptop
+1/5 played games on a nintendo switch
+
+This showed that i should focus my efforts on bringing the game to pcs and laptops
+
+
+
 #### **Platforms for designs**
 
 I have considered two options for languages to develop the software:
@@ -92,3 +105,6 @@ My game should be open source and fast paced. It should avoid...
 * The game should run with FPS over 60 for smooth game play
 * NPC enemies which can path find to the player
 * 
+
+## **Design**
+

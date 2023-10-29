@@ -1,4 +1,4 @@
-import pygame
+from dependencies import *
 
 FRAMERATE = 60
 AIM_INDICATOR_DISTANCE_FROM_PLAYER = 50
