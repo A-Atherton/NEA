@@ -2,6 +2,8 @@ from dependencies import *
 from constants import *
 from level import Level
 from player import Player
+from tile import Tile
+from spawners import Gun_Spawner, Player_Spawner
 
 class Game():
     def __init__(self, layouts, surface, clock) -> None:

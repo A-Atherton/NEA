@@ -5,11 +5,15 @@ from joystick_class import Joystick_Class
 from player import Player
 #CONSTANTS
 
-def load_levels():
+def load_levels(surface):
     """takes all levels from the levels folder and converts the text files into a
     a list of strings (pretty much a 2D array). It adds these arrays into another
     array which is passed as an parameter
+
+    Args:
+        surface (a pygame surface): _description_
     """
+    
     levels_list = []
     with os.scandir('levels/') as entries:
         for entry in entries:
@@ -20,7 +24,7 @@ def load_levels():
             levels_list.append(level_layout)
     
     global game
-    game = Game(levels_list, screen)
+    game = Game(levels_list, surface)
 
 #Pygame Setup
 pygame.init()
