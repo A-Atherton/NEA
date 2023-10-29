@@ -113,7 +113,11 @@ movement is currently very fast and unnatural but that will be changed in later 
 
 ![Alt text](<Screenshot 2023-07-24 at 13.08.50.png>) added a weapon parent class for use later.
 
+I also added some images to the game such as a background image that is rendered before all other items, tile images and player images. The tile player images were being blited to the surface which resulted in black areas where there should be alpha. 
+
 ![Alt text](<Screenshot 2023-07-27 at 10.50.47.png>)
+
+I fixed this by rendering blitting the image with the alpha to the screen instead
 
 ![Alt text](<Screenshot 2023-07-27 at 14.56.26.png>)
 
