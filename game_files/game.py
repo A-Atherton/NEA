@@ -36,7 +36,7 @@ class Game():
                     if cell == "P":
                         temp.player_spawners.add(Player_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
                     if cell == "S":
-                        temp.gun_spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png"))
+                        temp.gun_spawners.add(Gun_Spawner((x,y),self.tile_size, False, "gun_spawn.png", self))
                     if cell == " ":
                         pass
                         #self.tile.add(Tile((x,y), self.tile_size, False, ))
@@ -49,7 +49,7 @@ class Game():
             player.velocity.x += player.acceleration.x * dt
             player.velocity.x = max(-PLAYER_MAX_VELOCITY, min(player.velocity.x, PLAYER_ACCELERATION_RATE))
             if abs(player.velocity.x) < .01: player.velocity.x = 0
-            print(player.velocity.x * dt + (player.acceleration.x * .5) * (dt * dt))
+
             
             player.rect.x += player.velocity.x * dt + (player.acceleration.x * .5) * (dt * dt)
             
@@ -123,7 +123,7 @@ class Game():
         """
         
         if pygame.key.get_pressed()[pygame.K_e] and not self.keyboard_player_spawned:
-            self.players.add(Player((100,100), False))
+            self.players.add(Player((100,100), False, self, self.display_surface))
             self.keyboard_player_spawned = True
             print("Keyboard player added")
         
