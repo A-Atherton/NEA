@@ -235,3 +235,11 @@ Changing physics system for players to be more realistic and feal more realistic
 
 I started restructuring my code to be separated into different files then importing the require parts of the game into the required places. Whilst doing this I found I wanted my code to use composition rather than aggregation for components such as the players. Players only need to be linked one game as one player will not be in two different games. 
 
+After finishing this I went on to work on the system for the player images. As the player is just one image when moving left the player still looks as though they are facing right. Also when moving the player does not move so looks as though they are sliding across the ground. There is no animation for jumping either. This looks odd and would be detrimental to the finished product.
+
+To firstly improve the first problem I added some logic to detect the direction the player is moving and chosing between the right facing image and the left facing image. ![Alt text](<Screenshot from 2023-11-04 17-04-49.png>)
+
+The left facing image is just the right image that has been reversed using a function from pygame. 
+![Alt text](<Screenshot from 2023-11-04 17-06-20.png>)
+
+I stored both in a list that is stored in memory. This means that less time is spent get the image from secondary storage which would bottleneck the program. RAM is much faster retrieve information from so the program is faster. 
