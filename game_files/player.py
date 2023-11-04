@@ -5,7 +5,12 @@ from bullet import Bullet
 class Player(pygame.sprite.Sprite):
     def __init__( self, position, controller_player, game, display_surface, joystick=None) -> None:
         super().__init__()
-        self.image = pygame.image.load(os.path.abspath("assets/player/player.png"))
+        
+        temp = pygame.image.load(os.path.abspath("assets/player/player.png"))
+        self.character_images = [ pygame.transform.flip(temp, True, False), temp]
+        self.image = self.character_images[0]
+        self.frame_counter = 0
+        
         self.rect = self.image.get_rect(topleft = position)
         self.game = game
         self.display_surface = display_surface
@@ -13,6 +18,7 @@ class Player(pygame.sprite.Sprite):
         if controller_player: self.controller = joystick
         self.spawned = False
         self.dead = False
+        
 
         #movement
         self.speed = 6
@@ -21,7 +27,6 @@ class Player(pygame.sprite.Sprite):
         self.jump_counter = 1
         self.velocity = pygame.Vector2(0,0)
         self.acceleration = pygame.Vector2(0,0)
-        self.flip = False
 
         #combat
         self.health = 100
@@ -57,9 +62,10 @@ class Player(pygame.sprite.Sprite):
                 self.time_of_last_shot = pygame.time.get_ticks()
         
         #keyboard player
-        else:       
+        else:
             keys = pygame.key.get_pressed()
             clicks = pygame.mouse.get_pressed(num_buttons=3)
+        
             if keys[pygame.K_d]: #move right
                 self.acceleration.x = PLAYER_ACCELERATION_RATE
             elif keys[pygame.K_a]: #move left
@@ -155,10 +161,41 @@ class Player(pygame.sprite.Sprite):
     def do_damage(self, damage_amount: int):
         self.health -= damage_amount
 
-    def facing(self):
+    def change_direction_facing(self):
         if self.velocity.x > 0:
-            True
+            self.image = self.character_images[1]
         else:
-            self.flip = False
-        self.image = pygame.transform.flip(pygame.image.load(os.path.abspath("assets/player/player.png")), self.flip, False)
+            self.image = self.character_images[0]
+    
+    def update_frame(self):
+        self.frame_counter += 1
+        if self.frame_counter % 8 == 0:
+            pass
+        
 
+    def load_sprites(self, path):
+        """loads creates a list of images and a list of the flipped images when given the location of the folder
+
+        Args:
+            path (string): path of folder to extract images from
+
+        Returns:
+            _type_: _description_
+        """
+        frames_right = []
+        frames_left = []
+        with os.scandir(path) as entries:
+            for entry in entries:
+                temp = pygame.image.load(entry)
+                frames_right.append(temp)
+                frames_left.append(pygame.transform.flip(temp, True, False))
+            return (frames_left, frames_right)
+    
+    def assign_image_arrays(self):
+        self.idle_image_list = self.load_sprites("assets/player/character_idle")
+        self.run_image_list = self.load_sprites("assets/player/character_run")
+    
+    def move(self, position: pygame.Vector2):
+        self.velocity = pygame.Vector2(0,0)
+        self.acceleration = pygame.Vector2(0,0)
+        self.position = position
