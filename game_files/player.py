@@ -3,13 +3,16 @@ from constants import *
 from bullet import Bullet
 
 class Player(pygame.sprite.Sprite):
-    def __init__( self, position, controller_player, game, display_surface, joystick=None) -> None:
+    def __init__( self, position, controller_player, game, display_surface, joystick=None ) -> None:
         super().__init__()
         
         temp = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.character_images = [ pygame.transform.flip(temp, True, False), temp]
         self.image = self.character_images[0]
-        self.frame_counter = 0
+        self.game_frame_counter = 0
+        self.character_frame_counter = 0
+        self.facing_left = True
+        self.assign_image_arrays()
         
         self.rect = self.image.get_rect(topleft = position)
         self.game = game
@@ -100,7 +103,8 @@ class Player(pygame.sprite.Sprite):
         if self.health <= 0:
             self.dead = True
         
-        self.facing()
+        self.find_direction_facing()
+        self.update_frame()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         if self.controller_player: #controller player
@@ -161,16 +165,18 @@ class Player(pygame.sprite.Sprite):
     def do_damage(self, damage_amount: int):
         self.health -= damage_amount
 
-    def change_direction_facing(self):
-        if self.velocity.x > 0:
-            self.image = self.character_images[1]
-        else:
-            self.image = self.character_images[0]
+    def find_direction_facing(self):
+        if self.velocity.x > 0: self.facing_left = True
+        else: self.facing_left = False
     
     def update_frame(self):
-        self.frame_counter += 1
-        if self.frame_counter % 8 == 0:
-            pass
+        self.game_frame_counter += 1
+
+        if self.game_frame_counter % 2 == 0:
+            self.character_frame_counter += 1
+            self.image = self.idle_image_list[int(self.facing_left)][self.character_frame_counter % len(self.idle_image_list[0])]
+            temp = self.rect.topleft
+            self.rect = self.image.get_rect(topleft = temp)
         
 
     def load_sprites(self, path):
@@ -185,8 +191,9 @@ class Player(pygame.sprite.Sprite):
         frames_right = []
         frames_left = []
         with os.scandir(path) as entries:
-            for entry in entries:
-                temp = pygame.image.load(entry)
+            for entry in sorted(entries, key=lambda entry: entry.name):
+                print(entry)
+                temp = pygame.transform.scale_by(pygame.image.load(entry), 2)
                 frames_right.append(temp)
                 frames_left.append(pygame.transform.flip(temp, True, False))
             return (frames_left, frames_right)
@@ -196,6 +203,11 @@ class Player(pygame.sprite.Sprite):
         self.run_image_list = self.load_sprites("assets/player/character_run")
     
     def move(self, position: pygame.Vector2):
+        """moves the player to a specified position and sets their movement variables to 0
+
+        Args:
+            position (pygame.Vector2): position to move the player to
+        """
         self.velocity = pygame.Vector2(0,0)
         self.acceleration = pygame.Vector2(0,0)
-        self.position = position
+        self.rect.topleft = position

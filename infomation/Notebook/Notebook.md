@@ -243,3 +243,28 @@ The left facing image is just the right image that has been reversed using a fun
 ![Alt text](<Screenshot from 2023-11-04 17-06-20.png>)
 
 I stored both in a list that is stored in memory. This means that less time is spent get the image from secondary storage which would bottleneck the program. RAM is much faster retrieve information from so the program is faster. 
+
+the animations were more difficult. Too make an animation many frames were needed. I found a free asset pack for testing on itch.io however this used a sprite sheet which is one large image which would be difficult to use in the game. Instead i used a program called Alferd Spritesheet Unpacker to make many png images. I then put these images in a folder which i could iterate through to make a list of frames. ![Alt text](load_sprites_function.png)
+
+I created two lists that were stored in a tuple. One list for each direction the player was facing. This had the benefit of speed as the image was not being flipped (a computationally difficult task) every time it was needed. 
+
+This worked however the animation was not displaying correctly.
+
+
+I added a print function ad it printed `<DirEntry '9.png'> <DirEntry '4.png'> <DirEntry '3.png'> <DirEntry '2.png'> <DirEntry '7.png'> <DirEntry '8.png'> <DirEntry '6.png'> <DirEntry '0.png'> <DirEntry '5.png'> <DirEntry '1.png'> <DirEntry '4.png'> <DirEntry '3.png'> <DirEntry '2.png'> <DirEntry '7.png'> <DirEntry '6.png'> <DirEntry '0.png'> <DirEntry '1.png'> <DirEntry '5.png'>` To the terminal. As you can see the files are not sorted alphabetically by name. To fix this I tried sorting the entries list.
+
+![Alt text](load_sprites_with_sorted.png)
+
+however it resulted in an error.
+
+![Alt text](error_after_adding_sorted.png)
+
+This is because each item in entries is not a string so cannot be compared. Instead I set the key to be the name for each item. 
+
+![Alt text](adding_a_key.png)
+
+I checked using the print function again and it printed `<DirEntry '0.png'> <DirEntry '1.png'> <DirEntry '2.png'> <DirEntry '3.png'> <DirEntry '4.png'> <DirEntry '5.png'> <DirEntry '6.png'> <DirEntry '7.png'> <DirEntry '8.png'> <DirEntry '9.png'>` to the terminal which showed it was working. 
+
+
+To display the animation I needed to keep track of the frames. I created a counter that gets incremented every frame and only changed the every eighth frame (an abratrary number which i may change in the future). Also depending on the direction the player is facing the program chooses between the left facing and right facing images.
+![Alt text](<Screenshot from 2023-11-04 19-03-03.png>)

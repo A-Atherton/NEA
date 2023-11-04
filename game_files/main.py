@@ -16,7 +16,7 @@ def load_levels(surface, clock):
     
     levels_list = []
     with os.scandir('game_files/levels/') as entries:
-        for entry in entries:
+        for entry in sorted(entries, key=lambda entry: entry.name):
             level_layout = []
             with open(entry, 'r') as level:
                 for line in level:

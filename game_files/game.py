@@ -45,7 +45,7 @@ class Game():
         for player in self.players.sprites():
             dt = 1
             #horizontal check
-            player.acceleration.x += player.velocity.x * PLAYER_FRICTION * player.direction
+            player.acceleration.x += player.velocity.x * PLAYER_FRICTION
             player.velocity.x += player.acceleration.x * dt
             player.velocity.x = max(-PLAYER_MAX_VELOCITY, min(player.velocity.x, PLAYER_ACCELERATION_RATE))
             if abs(player.velocity.x) < .01: player.velocity.x = 0
