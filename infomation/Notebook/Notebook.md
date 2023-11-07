@@ -268,3 +268,6 @@ I checked using the print function again and it printed `<DirEntry '0.png'> <Dir
 
 To display the animation I needed to keep track of the frames. I created a counter that gets incremented every frame and only changed the every eighth frame (an abratrary number which i may change in the future). Also depending on the direction the player is facing the program chooses between the left facing and right facing images.
 ![Alt text](<Screenshot from 2023-11-04 19-03-03.png>)
+
+This kind of worked. The player was animated but since I was changing the size of the rect the player would teleport through walls. I assumed this was because the player was entering the walls of the game and moving because of it. To fix this I would either have to change the game to use images that all have the same size (This would mean that the players hit box would be larger than it appears to be and this could make the game irratating to play) or I can use ... . 
+

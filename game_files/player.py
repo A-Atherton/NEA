@@ -8,11 +8,12 @@ class Player(pygame.sprite.Sprite):
         
         temp = pygame.image.load(os.path.abspath("assets/player/player.png"))
         self.character_images = [ pygame.transform.flip(temp, True, False), temp]
-        self.image = self.character_images[0]
+        
         self.game_frame_counter = 0
         self.character_frame_counter = 0
         self.facing_left = True
         self.assign_image_arrays()
+        self.image = self.idle_image_list[0][0]
         
         self.rect = self.image.get_rect(topleft = position)
         self.game = game
@@ -175,8 +176,8 @@ class Player(pygame.sprite.Sprite):
         if self.game_frame_counter % 2 == 0:
             self.character_frame_counter += 1
             self.image = self.idle_image_list[int(self.facing_left)][self.character_frame_counter % len(self.idle_image_list[0])]
-            temp = self.rect.topleft
-            self.rect = self.image.get_rect(topleft = temp)
+            temp = self.rect.bottomleft 
+            self.rect = self.image.get_rect(bottomleft = temp)
         
 
     def load_sprites(self, path):
@@ -192,8 +193,7 @@ class Player(pygame.sprite.Sprite):
         frames_left = []
         with os.scandir(path) as entries:
             for entry in sorted(entries, key=lambda entry: entry.name):
-                print(entry)
-                temp = pygame.transform.scale_by(pygame.image.load(entry), 2)
+                temp = pygame.transform.scale_by(pygame.image.load(entry), 1.5)
                 frames_right.append(temp)
                 frames_left.append(pygame.transform.flip(temp, True, False))
             return (frames_left, frames_right)
