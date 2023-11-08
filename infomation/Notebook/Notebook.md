@@ -273,5 +273,6 @@ This kind of worked. The player was animated but since I was changing the size o
 
 TWO VIDEOS NEED TO BE ADDED IN HERE
 
+I added some logic that determines whether the player is moving in the x axis and shows the runnning animation if they are. 
 
 

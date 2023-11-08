@@ -105,7 +105,7 @@ class Player(pygame.sprite.Sprite):
             self.dead = True
         
         self.find_direction_facing()
-        self.update_frame()
+        self.do_animation_logic()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         if self.controller_player: #controller player
@@ -170,12 +170,17 @@ class Player(pygame.sprite.Sprite):
         if self.velocity.x > 0: self.facing_left = True
         else: self.facing_left = False
     
-    def update_frame(self):
+    def do_animation_logic(self):
+        if self.velocity.x > 0.1: self.update_frame(self.run_image_list)
+        else: self.update_frame(self.idle_image_list)
+            
+    
+    def update_frame(self, frames):
         self.game_frame_counter += 1
 
         if self.game_frame_counter % 2 == 0:
             self.character_frame_counter += 1
-            self.image = self.idle_image_list[int(self.facing_left)][self.character_frame_counter % len(self.idle_image_list[0])]
+            self.image = frames[int(self.facing_left)][self.character_frame_counter % len(frames[0])]
             temp = self.rect.bottomleft 
             self.rect = self.image.get_rect(bottomleft = temp)
         
