@@ -7,10 +7,12 @@ Researched different python modules to use for game development: [here](https://
 Best options were:
 
 * Pygame
+  
   * lots of other people using it
   * fast
 
 * Python Arcade
+  
   * Works well with PyInstaller to make executables
 
 ## Exploritory work
@@ -41,10 +43,7 @@ thinking of doing levels with a level map string after looking at a [video](http
 
 ![Alt text](<Screenshot 2023-07-19 at 18.13.54.png>)
 
-
-
-``` python
-
+```python
 class Level():
   def __init__(self, level, level_ID):
     self.level = level
@@ -73,7 +72,6 @@ I created a test tile and drew it
 here is the result
 
 ![Alt text](<Screenshot 2023-07-19 at 19.11.44.png>)
-
 
 created a method that runs when the object is created
 
@@ -140,12 +138,9 @@ To remedy this I changed the system used for aiming:
 
 I set the direction of aiming to be a normalized version of the position of the right joystick. This however does not work when the player is not pushing the right joystick. If the player is barely pushing or not pushing the joystick the joystick then the position of the left joystick (the one used for moving) will be used for the direction of shooting. If this is close to zero too then the aim direction will be set to a random direction.
 
-
 ![Alt text](<Screen Shot 2023-09-07 at 15.00.52.png>)
 
 This works ok for now but soon I will change it to store the last direction that the player aimed to be where to shoot. 
-
-
 
 I made a large change to the system I was using so that all levels are stored in the game class.
 
@@ -183,9 +178,7 @@ I set the key for next level to be "p" and it calls a method from the Game class
 
 Next i needed to add a new way of spawning players as before they were spawned on initialization of the level. This time a new method will be needed because each player object is not stored in each level
 
-
 The new method will run at the initialization of the game object. When the player presses the "start" button on the controller or the "E" key on the keyboard (keyboard support will be added later) a new player will be initiated. While the game is running if a the start button is pressed on a new controller (or its pressed on the keyboard) a new player will be intialised and will be spawned in the next level.
-
 
 to start I created a function that checks for a couple of inputs ("e" and button "A" on a controller) and spawns in a player if one of these is pressed
 
@@ -205,7 +198,6 @@ I added a function which spawns all the players in an appropriate spawning platf
 
 ![Alt text](player_spawning_code.png)
 
-
 I added some code that draws an aim indicator for a keyboard player. I also hid the mouse in the hopes that this would balance the keyboard and controller players.
 
 ![Alt text](keyboard_aim_code.png)
@@ -215,8 +207,6 @@ first the mouse position is recorded then the position of the mouse relative to 
 https://drive.google.com/file/d/1JNfhI7j8WD1jIEACEOWy0d4Jf1nMZzS2/view?usp=drive_link
 
 It works but sometimes the mouse comes out of the side of the window which means the player cannot shoot or aim. This should be fixed.
-
-
 
 I added code to shoot the weapon as well. This means that the game is playable on the keyboard and mouse.
 
@@ -231,7 +221,6 @@ https://drive.google.com/file/d/1vr3FaL602TrOZvsS-QuLlm39uO1xPzab/view?usp=drive
 In stick fight a game that has many of the features that i want in my game. The bullets are large yellow cone shapes that move quickly. The bullets size depend on the gun they were fired with. Currentlly bullets are simple 5 by 5 squres that detect whether they collide with an object each frame
 
 Changing physics system for players to be more realistic and feal more realistic in the game. To do this I used a variable called acceleration. I also used some equations to apply these. I tested this but something was not right. When pressing a joystick the player flew into the distance at very high speeds. **needs more and screen shots**
-
 
 I started restructuring my code to be separated into different files then importing the require parts of the game into the required places. Whilst doing this I found I wanted my code to use composition rather than aggregation for components such as the players. Players only need to be linked one game as one player will not be in two different games. 
 
@@ -250,7 +239,6 @@ I created two lists that were stored in a tuple. One list for each direction the
 
 This worked however the animation was not displaying correctly.
 
-
 I added a print function ad it printed `<DirEntry '9.png'> <DirEntry '4.png'> <DirEntry '3.png'> <DirEntry '2.png'> <DirEntry '7.png'> <DirEntry '8.png'> <DirEntry '6.png'> <DirEntry '0.png'> <DirEntry '5.png'> <DirEntry '1.png'> <DirEntry '4.png'> <DirEntry '3.png'> <DirEntry '2.png'> <DirEntry '7.png'> <DirEntry '6.png'> <DirEntry '0.png'> <DirEntry '1.png'> <DirEntry '5.png'>` To the terminal. As you can see the files are not sorted alphabetically by name. To fix this I tried sorting the entries list.
 
 ![Alt text](load_sprites_with_sorted.png)
@@ -264,7 +252,6 @@ This is because each item in entries is not a string so cannot be compared. Inst
 ![Alt text](adding_a_key.png)
 
 I checked using the print function again and it printed `<DirEntry '0.png'> <DirEntry '1.png'> <DirEntry '2.png'> <DirEntry '3.png'> <DirEntry '4.png'> <DirEntry '5.png'> <DirEntry '6.png'> <DirEntry '7.png'> <DirEntry '8.png'> <DirEntry '9.png'>` to the terminal which showed it was working. 
-
 
 To display the animation I needed to keep track of the frames. I created a counter that gets incremented every frame and only changed the every eighth frame (an abratrary number which i may change in the future). Also depending on the direction the player is facing the program chooses between the left facing and right facing images.
 ![Alt text](<Screenshot from 2023-11-04 19-03-03.png>)

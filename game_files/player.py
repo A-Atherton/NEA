@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         
 
         #movement
-        self.speed = 6
+        self.speed = PLAYER_SPEED
         self.gravity = .8
         self.jump_speed = -16
         self.jump_counter = 1
@@ -85,6 +85,17 @@ class Player(pygame.sprite.Sprite):
                 self.shoot(self.holding.bullet_speed)
                 self.holding.ammo_in_weapon -= 1
                 self.time_of_last_shot = pygame.time.get_ticks()
+    
+    def move_x_axis(self):
+        dt = 1
+        if self.acceleration.x > 0: self.acceleration.x += self.velocity.x * PLAYER_FRICTION
+        print(self.acceleration.x)
+        self.velocity.x += self.acceleration.x * dt
+        print(self.velocity.x)
+        self.velocity.x = max(-PLAYER_MAX_VELOCITY, min(self.velocity.x, PLAYER_ACCELERATION_RATE))
+        print(self.velocity.x)
+        if abs(self.velocity.x) < .01: self.velocity.x = 0
+        print("-----------------")
         
     def apply_gravity(self):
         self.velocity.y += self.gravity
