@@ -5,10 +5,6 @@ from bullet import Bullet
 class Player(pygame.sprite.Sprite):
     def __init__( self, position, controller_player, game, display_surface, joystick=None ) -> None:
         super().__init__()
-        
-        temp = pygame.image.load(os.path.abspath("assets/player/player.png"))
-        self.character_images = [ pygame.transform.flip(temp, True, False), temp]
-        
         self.game_frame_counter = 0
         self.character_frame_counter = 0
         self.facing_left = True
@@ -88,14 +84,16 @@ class Player(pygame.sprite.Sprite):
     
     def move_x_axis(self):
         dt = 1
-        if self.acceleration.x > 0: self.acceleration.x += self.velocity.x * PLAYER_FRICTION
-        print(self.acceleration.x)
+        
         self.velocity.x += self.acceleration.x * dt
+        if self.velocity.x > 0: self.velocity.x += PLAYER_FRICTION * dt
+        elif self.velocity.x < 0: self.velocity.x -= PLAYER_FRICTION * dt
+        if self.velocity.x > PLAYER_MAX_VELOCITY: self.velocity.x = PLAYER_MAX_VELOCITY
+        elif self.velocity.x < -PLAYER_MAX_VELOCITY: self.velocity.x = -PLAYER_MAX_VELOCITY
         print(self.velocity.x)
-        self.velocity.x = max(-PLAYER_MAX_VELOCITY, min(self.velocity.x, PLAYER_ACCELERATION_RATE))
-        print(self.velocity.x)
-        if abs(self.velocity.x) < .01: self.velocity.x = 0
+        if abs(self.velocity.x) < 0.5: self.velocity.x = 0
         print("-----------------")
+        
         
     def apply_gravity(self):
         self.velocity.y += self.gravity
@@ -106,6 +104,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.get_input()
+        self.move_x_axis()
         self.apply_gravity()
         if self.holding != None:
             self.holding.update(pygame.Vector2(self.rect.x, self.rect.y))
@@ -182,18 +181,20 @@ class Player(pygame.sprite.Sprite):
         else: self.facing_left = False
     
     def do_animation_logic(self):
-        if self.velocity.x > 0.1: self.update_frame(self.run_image_list)
+        if abs(self.velocity.x )> 0.5: self.update_frame(self.run_image_list, 3)
+        #if abs(self.velocity.x )> 4: self.update_frame(self.run_image_list, 2)
+        
         else: self.update_frame(self.idle_image_list)
             
     
-    def update_frame(self, frames):
+    def update_frame(self, frames, speed = 2):
         self.game_frame_counter += 1
 
-        if self.game_frame_counter % 2 == 0:
+        if self.game_frame_counter % speed == 0:
             self.character_frame_counter += 1
             self.image = frames[int(self.facing_left)][self.character_frame_counter % len(frames[0])]
             temp = self.rect.bottomleft 
-            self.rect = self.image.get_rect(bottomleft = temp)
+            #self.rect = self.image.get_rect(bottomleft = temp)
         
 
     def load_sprites(self, path):

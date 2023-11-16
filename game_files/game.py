@@ -45,7 +45,7 @@ class Game():
         for player in self.players.sprites():
             dt = 1
             #horizontal check
-            player.rect.x += player.velocity.x * dt + (player.acceleration.x * .5) * (dt * dt)
+            player.rect.x += player.velocity.x
             
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
