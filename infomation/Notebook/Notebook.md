@@ -7,10 +7,12 @@ Researched different python modules to use for game development: [here](https://
 Best options were:
 
 * Pygame
+  
   * lots of other people using it
   * fast
 
 * Python Arcade
+  
   * Works well with PyInstaller to make executables
 
 ## Exploritory work
@@ -41,10 +43,7 @@ thinking of doing levels with a level map string after looking at a [video](http
 
 ![Alt text](<Screenshot 2023-07-19 at 18.13.54.png>)
 
-
-
-``` python
-
+```python
 class Level():
   def __init__(self, level, level_ID):
     self.level = level
@@ -73,7 +72,6 @@ I created a test tile and drew it
 here is the result
 
 ![Alt text](<Screenshot 2023-07-19 at 19.11.44.png>)
-
 
 created a method that runs when the object is created
 
@@ -140,12 +138,9 @@ To remedy this I changed the system used for aiming:
 
 I set the direction of aiming to be a normalized version of the position of the right joystick. This however does not work when the player is not pushing the right joystick. If the player is barely pushing or not pushing the joystick the joystick then the position of the left joystick (the one used for moving) will be used for the direction of shooting. If this is close to zero too then the aim direction will be set to a random direction.
 
-
 ![Alt text](<Screen Shot 2023-09-07 at 15.00.52.png>)
 
 This works ok for now but soon I will change it to store the last direction that the player aimed to be where to shoot. 
-
-
 
 I made a large change to the system I was using so that all levels are stored in the game class.
 
@@ -183,9 +178,7 @@ I set the key for next level to be "p" and it calls a method from the Game class
 
 Next i needed to add a new way of spawning players as before they were spawned on initialization of the level. This time a new method will be needed because each player object is not stored in each level
 
-
 The new method will run at the initialization of the game object. When the player presses the "start" button on the controller or the "E" key on the keyboard (keyboard support will be added later) a new player will be initiated. While the game is running if a the start button is pressed on a new controller (or its pressed on the keyboard) a new player will be intialised and will be spawned in the next level.
-
 
 to start I created a function that checks for a couple of inputs ("e" and button "A" on a controller) and spawns in a player if one of these is pressed
 
@@ -205,7 +198,6 @@ I added a function which spawns all the players in an appropriate spawning platf
 
 ![Alt text](player_spawning_code.png)
 
-
 I added some code that draws an aim indicator for a keyboard player. I also hid the mouse in the hopes that this would balance the keyboard and controller players.
 
 ![Alt text](keyboard_aim_code.png)
@@ -215,8 +207,6 @@ first the mouse position is recorded then the position of the mouse relative to 
 https://drive.google.com/file/d/1JNfhI7j8WD1jIEACEOWy0d4Jf1nMZzS2/view?usp=drive_link
 
 It works but sometimes the mouse comes out of the side of the window which means the player cannot shoot or aim. This should be fixed.
-
-
 
 I added code to shoot the weapon as well. This means that the game is playable on the keyboard and mouse.
 
@@ -232,7 +222,6 @@ In stick fight a game that has many of the features that i want in my game. The 
 
 Changing physics system for players to be more realistic and feal more realistic in the game. To do this I used a variable called acceleration. I also used some equations to apply these. I tested this but something was not right. When pressing a joystick the player flew into the distance at very high speeds. **needs more and screen shots**
 
-
 I started restructuring my code to be separated into different files then importing the require parts of the game into the required places. Whilst doing this I found I wanted my code to use composition rather than aggregation for components such as the players. Players only need to be linked one game as one player will not be in two different games. 
 
 After finishing this I went on to work on the system for the player images. As the player is just one image when moving left the player still looks as though they are facing right. Also when moving the player does not move so looks as though they are sliding across the ground. There is no animation for jumping either. This looks odd and would be detrimental to the finished product.
@@ -243,3 +232,75 @@ The left facing image is just the right image that has been reversed using a fun
 ![Alt text](<Screenshot from 2023-11-04 17-06-20.png>)
 
 I stored both in a list that is stored in memory. This means that less time is spent get the image from secondary storage which would bottleneck the program. RAM is much faster retrieve information from so the program is faster. 
+
+the animations were more difficult. Too make an animation many frames were needed. I found a free asset pack for testing on itch.io however this used a sprite sheet which is one large image which would be difficult to use in the game. Instead i used a program called Alferd Spritesheet Unpacker to make many png images. I then put these images in a folder which i could iterate through to make a list of frames. ![Alt text](load_sprites_function.png)
+
+I created two lists that were stored in a tuple. One list for each direction the player was facing. This had the benefit of speed as the image was not being flipped (a computationally difficult task) every time it was needed. 
+
+This worked however the animation was not displaying correctly.
+
+I added a print function ad it printed `<DirEntry '9.png'> <DirEntry '4.png'> <DirEntry '3.png'> <DirEntry '2.png'> <DirEntry '7.png'> <DirEntry '8.png'> <DirEntry '6.png'> <DirEntry '0.png'> <DirEntry '5.png'> <DirEntry '1.png'> <DirEntry '4.png'> <DirEntry '3.png'> <DirEntry '2.png'> <DirEntry '7.png'> <DirEntry '6.png'> <DirEntry '0.png'> <DirEntry '1.png'> <DirEntry '5.png'>` To the terminal. As you can see the files are not sorted alphabetically by name. To fix this I tried sorting the entries list.
+
+![Alt text](load_sprites_with_sorted.png)
+
+however it resulted in an error.
+
+![Alt text](error_after_adding_sorted.png)
+
+This is because each item in entries is not a string so cannot be compared. Instead I set the key to be the name for each item. 
+
+![Alt text](adding_a_key.png)
+
+I checked using the print function again and it printed `<DirEntry '0.png'> <DirEntry '1.png'> <DirEntry '2.png'> <DirEntry '3.png'> <DirEntry '4.png'> <DirEntry '5.png'> <DirEntry '6.png'> <DirEntry '7.png'> <DirEntry '8.png'> <DirEntry '9.png'>` to the terminal which showed it was working. 
+
+To display the animation I needed to keep track of the frames. I created a counter that gets incremented every frame and only changed the every eighth frame (an abratrary number which i may change in the future). Also depending on the direction the player is facing the program chooses between the left facing and right facing images.
+![Alt text](<Screenshot from 2023-11-04 19-03-03.png>)
+
+This kind of worked. The player was animated but since I was changing the size of the rect the player would teleport through walls. I assumed this was because the player was entering the walls of the game and moving because of it. To fix this I would either have to change the game to use images that all have the same size (This would mean that the players hit box would be larger than it appears to be and this could make the game irratating to play). Instead I set the rect to be be set from the bottomleft of the player. This stopped the problems with the falling through the floor however when the player jumps and hits their head on the roof the player can move teleport through the ground above them. This was a temproary fix only. 
+
+TWO VIDEOS NEED TO BE ADDED IN HERE
+
+I added some logic that determines whether the player is moving in the x axis and shows the runnning animation if they are. 
+
+Methods for rounds:
+
+- have a list of the players that are currently alive in the game and if the length of the list is <= 1 then anounce that the winner is the last person in the list and load next level and spawn players and the score of the player is incremented. Downsides is that if a controller disconnects the.
+
+I added this logic to the game inside the game() function
+
+![Alt text](<Screenshot 2023-11-21 at 10.25.05.png>)
+
+the game creates a list of the players that are alive and checks the size of the list. If the size is 1 then a winner is returned and the game will get the next level and spawn all players.
+![Alt text](<Screenshot 2023-11-21 at 10.25.20.png>)
+
+upon testing i realised there was no way for a player to die if there is only one keyboard player as players are currently not killed if they fall of the map. Also If only one player is playing the game then the game will think the player has won and move on to the next level. There is also no logic to kill a player if their health is to low and no way for the players health to be brought back to 100 once the next level starts. I need to implement these features before continueing testing.
+
+I added a method within player that checks if the player is below 1500 pixels and puts their health to 0 and sets living to 0.
+
+![Alt text](<Screenshot 2023-11-21 at 12.56.28.png>)
+
+Also the method above it checks if the players health is lower than 0 and sets them to dead so that the game knows. 
+
+I also added a function within game that checks if the player the only one left and ends the round, moves on to the next level and respawns players. 
+
+![Alt text](<Screenshot 2023-11-21 at 12.54.44.png>)
+
+I tested the falling of the world function by jumping of the level but the level did not change. To investigate i printed the living players to check if the player is being killed.
+
+I found that the check_for_winner() function was not being called in the run() function. 
+after that fix I ran the game again and the player was killed when they fell far enough of the map however when they were respawned the game instantly switched to the next level forever. I suspected this was due to the player still having self.living set to False. 
+
+![Alt text](<Screenshot 2023-11-21 at 13.11.06.png>)
+
+I changed this in the spawn players function and the game worked when and the player died and respawned as wanted. Later I tested the game with multiple players to see if this worked. 
+
+
+To continue i needed to stop the players from being rendered and updated if they are dead. I also needed to create someway of keeping track of the players scores and some way of making the winner clear after each game. This could be done with a cutscreen class that gets passed the winner and is run for a set amount of time after each round. Alternatively I could create some large text that states who the winner is.
+
+Destruction of the enviroment:
+
+The first way I have thought of doing this is by killing the tile if it is impacted by a bullet. This is only one line to implement. 
+
+This worked well and as expected. To expand I am plan to replace the tile when hit with 4 smaller moving tiles that are affected by gravity. The difficult part is getting the tiles to interact with realistic physics. 
+
+I also considered adding wall jumoing to the game. To do this I would need to reset the jump counter when the player hits a wall. The problem with this is if the player is touching a wall and holds the jump key they will fly up the wall. Also to do this I would want only one wall jump. This would mean adding a variable that stores whether the player hjas jumped of a wall since jumping of the floor. Also I would want to only have the player be able to jump if they are directky touching the wall. 

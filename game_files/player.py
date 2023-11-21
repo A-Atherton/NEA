@@ -3,13 +3,13 @@ from constants import *
 from bullet import Bullet
 
 class Player(pygame.sprite.Sprite):
-    def __init__( self, position, controller_player, game, display_surface, joystick=None) -> None:
+    def __init__( self, position, controller_player, game, display_surface, joystick=None ) -> None:
         super().__init__()
-        
-        temp = pygame.image.load(os.path.abspath("assets/player/player.png"))
-        self.character_images = [ pygame.transform.flip(temp, True, False), temp]
-        self.image = self.character_images[0]
-        self.frame_counter = 0
+        self.game_frame_counter = 0
+        self.character_frame_counter = 0
+        self.facing_left = True
+        self.assign_image_arrays()
+        self.image = self.idle_image_list[0][0]
         
         self.rect = self.image.get_rect(topleft = position)
         self.game = game
@@ -17,11 +17,10 @@ class Player(pygame.sprite.Sprite):
         self.controller_player = controller_player
         if controller_player: self.controller = joystick
         self.spawned = False
-        self.dead = False
         
 
         #movement
-        self.speed = 6
+        self.speed = PLAYER_SPEED
         self.gravity = .8
         self.jump_speed = -16
         self.jump_counter = 1
@@ -32,6 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.holding = None
         self.time_of_last_shot = 0 
+        self.living = True
     
     def get_input(self):
         
@@ -81,6 +81,27 @@ class Player(pygame.sprite.Sprite):
                 self.shoot(self.holding.bullet_speed)
                 self.holding.ammo_in_weapon -= 1
                 self.time_of_last_shot = pygame.time.get_ticks()
+    def check_if_dead(self):
+        if self.health <= 0:
+            self.living = False
+    
+    def check_if_of_map(self):
+        if self.rect.y > 1500:
+            self.health = 0
+            self.living = False
+    
+    def move_x_axis(self):
+        dt = 1
+        
+        self.velocity.x += self.acceleration.x * dt
+        if self.velocity.x > 0: self.velocity.x += PLAYER_FRICTION * dt
+        elif self.velocity.x < 0: self.velocity.x -= PLAYER_FRICTION * dt
+        if self.velocity.x > PLAYER_MAX_VELOCITY: self.velocity.x = PLAYER_MAX_VELOCITY
+        elif self.velocity.x < -PLAYER_MAX_VELOCITY: self.velocity.x = -PLAYER_MAX_VELOCITY
+        print(self.rect.y)
+        if abs(self.velocity.x) < 0.5: self.velocity.x = 0
+        print("-----------------")
+        
         
     def apply_gravity(self):
         self.velocity.y += self.gravity
@@ -90,8 +111,11 @@ class Player(pygame.sprite.Sprite):
         self.jump_counter -= 1
 
     def update(self):
+        self.check_if_dead()
         self.get_input()
+        self.move_x_axis()
         self.apply_gravity()
+        self.check_if_of_map()
         if self.holding != None:
             self.holding.update(pygame.Vector2(self.rect.x, self.rect.y))
             if self.holding.ammo_in_weapon <= 0:
@@ -100,7 +124,8 @@ class Player(pygame.sprite.Sprite):
         if self.health <= 0:
             self.dead = True
         
-        self.facing()
+        self.find_direction_facing()
+        self.do_animation_logic()
 
     def get_aim_direction(self): #draws the direction that the player is aiming
         if self.controller_player: #controller player
@@ -161,16 +186,25 @@ class Player(pygame.sprite.Sprite):
     def do_damage(self, damage_amount: int):
         self.health -= damage_amount
 
-    def change_direction_facing(self):
-        if self.velocity.x > 0:
-            self.image = self.character_images[1]
-        else:
-            self.image = self.character_images[0]
+    def find_direction_facing(self):
+        if self.velocity.x > 0: self.facing_left = True
+        else: self.facing_left = False
     
-    def update_frame(self):
-        self.frame_counter += 1
-        if self.frame_counter % 8 == 0:
-            pass
+    def do_animation_logic(self):
+        if abs(self.velocity.x )> 0.5: self.update_frame(self.run_image_list, 3)
+        #if abs(self.velocity.x )> 4: self.update_frame(self.run_image_list, 2)
+        
+        else: self.update_frame(self.idle_image_list)
+            
+    
+    def update_frame(self, frames, speed = 2):
+        self.game_frame_counter += 1
+
+        if self.game_frame_counter % speed == 0:
+            self.character_frame_counter += 1
+            self.image = frames[int(self.facing_left)][self.character_frame_counter % len(frames[0])]
+            temp = self.rect.bottomleft 
+            #self.rect = self.image.get_rect(bottomleft = temp)
         
 
     def load_sprites(self, path):
@@ -185,8 +219,8 @@ class Player(pygame.sprite.Sprite):
         frames_right = []
         frames_left = []
         with os.scandir(path) as entries:
-            for entry in entries:
-                temp = pygame.image.load(entry)
+            for entry in sorted(entries, key=lambda entry: entry.name):
+                temp = pygame.transform.scale_by(pygame.image.load(entry), 1.5)
                 frames_right.append(temp)
                 frames_left.append(pygame.transform.flip(temp, True, False))
             return (frames_left, frames_right)
@@ -196,6 +230,11 @@ class Player(pygame.sprite.Sprite):
         self.run_image_list = self.load_sprites("assets/player/character_run")
     
     def move(self, position: pygame.Vector2):
+        """moves the player to a specified position and sets their movement variables to 0
+
+        Args:
+            position (pygame.Vector2): position to move the player to
+        """
         self.velocity = pygame.Vector2(0,0)
         self.acceleration = pygame.Vector2(0,0)
-        self.position = position
+        self.rect.topleft = position
