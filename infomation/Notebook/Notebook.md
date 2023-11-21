@@ -303,3 +303,4 @@ The first way I have thought of doing this is by killing the tile if it is impac
 
 This worked well and as expected. To expand I am plan to replace the tile when hit with 4 smaller moving tiles that are affected by gravity. The difficult part is getting the tiles to interact with realistic physics. 
 
+I also considered adding wall jumoing to the game. To do this I would need to reset the jump counter when the player hits a wall. The problem with this is if the player is touching a wall and holds the jump key they will fly up the wall. Also to do this I would want only one wall jump. This would mean adding a variable that stores whether the player hjas jumped of a wall since jumping of the floor. Also I would want to only have the player be able to jump if they are directky touching the wall. 
