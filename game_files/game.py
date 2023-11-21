@@ -87,6 +87,7 @@ class Game():
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
                     bullet.kill()
+                    tile.kill()
         
     def weapon_collision_check(self) -> None:
         
@@ -107,9 +108,13 @@ class Game():
         self.players.draw(self.display_surface)
         self.bullets.draw(self.display_surface)
         self.current_level.gun_spawners.draw(self.display_surface)
-        self.check_for_players()
+        self.check_for_new_players()
+        if self.check_for_winner():
+            print("someone won the round")
+            self.next_level()
+        
 
-    def check_for_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
+    def check_for_new_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
         """
         for joy_itr in joysticks:
             if joy_itr.joystick.get_button(0):
@@ -144,7 +149,26 @@ class Game():
 
                     if not spawner.used:
                         player.rect.topleft = spawner.rect.topleft
-
+                        player.health = 100
+                        player.living = True
                         spawner.used = True
                         break
+    def check_for_winner(self):
+        living_players = []
+        for player in self.players:
+            if player.living: living_players.append(player)
+        print(living_players)
+        
+        if len(living_players) == 1 and len(self.players) > 1:
+            return True
+        
+        elif len(self.players) == 1 and len(living_players) <= 0:
+            return True
+        
+        elif len(living_players) == 0:
+            return False
+        
+        else:
+            return False
+        
              

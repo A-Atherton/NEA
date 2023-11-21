@@ -17,7 +17,6 @@ class Player(pygame.sprite.Sprite):
         self.controller_player = controller_player
         if controller_player: self.controller = joystick
         self.spawned = False
-        self.dead = False
         
 
         #movement
@@ -32,6 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.holding = None
         self.time_of_last_shot = 0 
+        self.living = True
     
     def get_input(self):
         
@@ -81,6 +81,14 @@ class Player(pygame.sprite.Sprite):
                 self.shoot(self.holding.bullet_speed)
                 self.holding.ammo_in_weapon -= 1
                 self.time_of_last_shot = pygame.time.get_ticks()
+    def check_if_dead(self):
+        if self.health <= 0:
+            self.living = False
+    
+    def check_if_of_map(self):
+        if self.rect.y > 1500:
+            self.health = 0
+            self.living = False
     
     def move_x_axis(self):
         dt = 1
@@ -90,7 +98,7 @@ class Player(pygame.sprite.Sprite):
         elif self.velocity.x < 0: self.velocity.x -= PLAYER_FRICTION * dt
         if self.velocity.x > PLAYER_MAX_VELOCITY: self.velocity.x = PLAYER_MAX_VELOCITY
         elif self.velocity.x < -PLAYER_MAX_VELOCITY: self.velocity.x = -PLAYER_MAX_VELOCITY
-        print(self.velocity.x)
+        print(self.rect.y)
         if abs(self.velocity.x) < 0.5: self.velocity.x = 0
         print("-----------------")
         
@@ -103,9 +111,11 @@ class Player(pygame.sprite.Sprite):
         self.jump_counter -= 1
 
     def update(self):
+        self.check_if_dead()
         self.get_input()
         self.move_x_axis()
         self.apply_gravity()
+        self.check_if_of_map()
         if self.holding != None:
             self.holding.update(pygame.Vector2(self.rect.x, self.rect.y))
             if self.holding.ammo_in_weapon <= 0:

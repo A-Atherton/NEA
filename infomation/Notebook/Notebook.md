@@ -262,4 +262,44 @@ TWO VIDEOS NEED TO BE ADDED IN HERE
 
 I added some logic that determines whether the player is moving in the x axis and shows the runnning animation if they are. 
 
+Methods for rounds:
+
+- have a list of the players that are currently alive in the game and if the length of the list is <= 1 then anounce that the winner is the last person in the list and load next level and spawn players and the score of the player is incremented. Downsides is that if a controller disconnects the.
+
+I added this logic to the game inside the game() function
+
+![Alt text](<Screenshot 2023-11-21 at 10.25.05.png>)
+
+the game creates a list of the players that are alive and checks the size of the list. If the size is 1 then a winner is returned and the game will get the next level and spawn all players.
+![Alt text](<Screenshot 2023-11-21 at 10.25.20.png>)
+
+upon testing i realised there was no way for a player to die if there is only one keyboard player as players are currently not killed if they fall of the map. Also If only one player is playing the game then the game will think the player has won and move on to the next level. There is also no logic to kill a player if their health is to low and no way for the players health to be brought back to 100 once the next level starts. I need to implement these features before continueing testing.
+
+I added a method within player that checks if the player is below 1500 pixels and puts their health to 0 and sets living to 0.
+
+![Alt text](<Screenshot 2023-11-21 at 12.56.28.png>)
+
+Also the method above it checks if the players health is lower than 0 and sets them to dead so that the game knows. 
+
+I also added a function within game that checks if the player the only one left and ends the round, moves on to the next level and respawns players. 
+
+![Alt text](<Screenshot 2023-11-21 at 12.54.44.png>)
+
+I tested the falling of the world function by jumping of the level but the level did not change. To investigate i printed the living players to check if the player is being killed.
+
+I found that the check_for_winner() function was not being called in the run() function. 
+after that fix I ran the game again and the player was killed when they fell far enough of the map however when they were respawned the game instantly switched to the next level forever. I suspected this was due to the player still having self.living set to False. 
+
+![Alt text](<Screenshot 2023-11-21 at 13.11.06.png>)
+
+I changed this in the spawn players function and the game worked when and the player died and respawned as wanted. Later I tested the game with multiple players to see if this worked. 
+
+
+To continue i needed to stop the players from being rendered and updated if they are dead. I also needed to create someway of keeping track of the players scores and some way of making the winner clear after each game. This could be done with a cutscreen class that gets passed the winner and is run for a set amount of time after each round. Alternatively I could create some large text that states who the winner is.
+
+Destruction of the enviroment:
+
+The first way I have thought of doing this is by killing the tile if it is impacted by a bullet. This is only one line to implement. 
+
+This worked well and as expected. To expand I am plan to replace the tile when hit with 4 smaller moving tiles that are affected by gravity. The difficult part is getting the tiles to interact with realistic physics. 
 
