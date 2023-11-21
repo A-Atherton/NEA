@@ -1,6 +1,11 @@
 from dependencies import *
 
 class Tile(pygame.sprite.Sprite):
+    """structure for holding all of the variables of a tile
+
+    Args:
+        pygame (_type_): _description_
+    """
     def __init__(self, position, size: int, collision: bool, asset_path: str) -> None:
         super().__init__()
         self.image = pygame.image.load(os.path.abspath("assets/tile/" + asset_path))

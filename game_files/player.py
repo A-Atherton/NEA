@@ -34,6 +34,8 @@ class Player(pygame.sprite.Sprite):
         self.living = True
     
     def get_input(self):
+        """gets the players input (from either controller or keyboard) and moves the player accordingly
+        """
         
         time_since_last_shot = pygame.time.get_ticks()- self.time_of_last_shot
         
@@ -82,15 +84,21 @@ class Player(pygame.sprite.Sprite):
                 self.holding.ammo_in_weapon -= 1
                 self.time_of_last_shot = pygame.time.get_ticks()
     def check_if_dead(self):
+        """checks if should be dead and sets living to false if so
+        """
         if self.health <= 0:
             self.living = False
     
     def check_if_of_map(self):
+        """checks if the player is off the map and sets living to false if so
+        """
         if self.rect.y > 1500:
             self.health = 0
             self.living = False
     
     def move_x_axis(self):
+        """moves the player on the x axis and does some physics stuff
+        """
         dt = 1
         
         self.velocity.x += self.acceleration.x * dt
@@ -104,13 +112,19 @@ class Player(pygame.sprite.Sprite):
         
         
     def apply_gravity(self):
+        """applies gravity to the player
+        """
         self.velocity.y += self.gravity
 
     def jump(self):
+        """makes the player jump
+        """
         self.velocity.y = self.jump_speed
         self.jump_counter -= 1
 
     def update(self):
+        """updates the player
+        """
         self.check_if_dead()
         self.get_input()
         self.move_x_axis()
@@ -121,13 +135,12 @@ class Player(pygame.sprite.Sprite):
             if self.holding.ammo_in_weapon <= 0:
                 self.holding.kill()
                 self.holding = None
-        if self.health <= 0:
-            self.dead = True
-        
         self.find_direction_facing()
         self.do_animation_logic()
 
-    def get_aim_direction(self): #draws the direction that the player is aiming
+    def get_aim_direction(self):
+        """gets the direction the player is aiming and draws a circle on the screen to show where they are aiming
+        """
         if self.controller_player: #controller player
             right_x_offset = self.controller.get_axis(2)
             right_y_offset = self.controller.get_axis(3)
@@ -176,21 +189,40 @@ class Player(pygame.sprite.Sprite):
             pygame.draw.circle(self.display_surface, "white", aim_cursor_position, 4)        
         
     def shoot(self, bullet_speed):
+        """creates a bullet that is shot in the direction the player is aiming
+
+        Args:
+            bullet_speed (_type_): _description_
+        """
         self.game.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))
     
     def pick_up(self, weapon):
+        """picks up a weapon and adds it to the weapons group and sets the players holding variable to the weapon
+
+        Args:
+            weapon (object): a wepon object
+        """
         self.holding = weapon
         self.game.weapons.add(self.holding)
         
     def do_damage(self, damage_amount: int):
+        """does damage to the player
+
+        Args:
+            damage_amount (int): the amount of damage to do to the player
+        """
         self.health -= damage_amount
 
     def find_direction_facing(self):
+        """deprecated
+        """
         if self.velocity.x > 0: self.facing_left = True
         else: self.facing_left = False
     
     def do_animation_logic(self):
+        """determines which animation to play
+        """
         if abs(self.velocity.x )> 0.5: self.update_frame(self.run_image_list, 3)
         #if abs(self.velocity.x )> 4: self.update_frame(self.run_image_list, 2)
         
@@ -198,6 +230,12 @@ class Player(pygame.sprite.Sprite):
             
     
     def update_frame(self, frames, speed = 2):
+        """changes the image/frame of the player to be the next frame in the animation
+
+        Args:
+            frames (list): list of images to be used in the animation
+            speed (int, optional): rate of animation. Defaults to 2.
+        """
         self.game_frame_counter += 1
 
         if self.game_frame_counter % speed == 0:
@@ -226,6 +264,8 @@ class Player(pygame.sprite.Sprite):
             return (frames_left, frames_right)
     
     def assign_image_arrays(self):
+        """assigns the idle and run image arrays
+        """
         self.idle_image_list = self.load_sprites("assets/player/character_idle")
         self.run_image_list = self.load_sprites("assets/player/character_run")
     

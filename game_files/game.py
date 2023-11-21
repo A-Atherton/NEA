@@ -18,6 +18,12 @@ class Game():
         self.keyboard_player_spawned = False
         
     def level_setup(self, layouts) -> None:
+        """takes in the level layouts from the levels
+        file and creates a level object for each layout
+
+        Args:
+            layouts (Array): 2D array of strings. Each array of strings represents the level layout of one layout
+        """
         #self.player_que = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
@@ -42,6 +48,11 @@ class Game():
                         #self.tile.add(Tile((x,y), self.tile_size, False, ))
                    
     def player_collision_check(self,dt) -> None:
+        """checks for collisions between players and tiles, players and bullets, and players and weapons
+
+        Args:
+            dt (float): the time between now and the last frame (not currently being used)
+        """
         for player in self.players.sprites():
             dt = 1
             #horizontal check
@@ -82,14 +93,25 @@ class Game():
                     if weapon.rect.colliderect(player.rect):
                         player.holding = weapon
 
-    def bullet_collision_check(self,dt) -> None: #kills the bullet if it hits a solid tile
+    def bullet_collision_check(self,dt) -> None:
+        """checks for collisions between bullets and tiles
+
+        Args:
+            dt (float): the time between now and the last frame (not currently being used)
+        """
         for bullet in self.bullets.sprites():
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
                     bullet.kill()
                     tile.kill()
         
-    def weapon_collision_check(self) -> None:
+    def weapon_collision_check(self, dt) -> None:
+        """Checks for collision between weapons and tiles and stops the 
+        weapon from moving if it collides with a tile (not currently being used)
+
+        Args:
+            dt (float): the time between now and the last frame (not currently being used)
+        """
         
         for tile in self.current_level.tiles:
             pass
@@ -114,11 +136,9 @@ class Game():
             self.next_level()
         
 
-    def check_for_new_players(self) -> None: #function to check for a new controller, add a new player and spawn them in the next level
+    def check_for_new_players(self) -> None: 
         """
-        for joy_itr in joysticks:
-            if joy_itr.joystick.get_button(0):
-                print("button pressed")
+        check for a new keyboard player (and controller in the future), add a new player and spawn them in the next level
         """
         
         if pygame.key.get_pressed()[pygame.K_e] and not self.keyboard_player_spawned:
@@ -127,6 +147,8 @@ class Game():
             print("Keyboard player added")
         
     def next_level(self):
+        """loads the next level and resets the players and weapons
+        """
         self.current_level_counter += 1
         self.current_level = self.levels[self.current_level_counter % len(self.levels)]
         for weapon in self.weapons.sprites():
@@ -142,6 +164,8 @@ class Game():
         self.spawn_players()
 
     def spawn_players(self):
+        """spawns the players in the level
+        """
         for i, player in enumerate(self.players.sprites()):
             if not player.spawned:
 
@@ -154,6 +178,11 @@ class Game():
                         spawner.used = True
                         break
     def check_for_winner(self):
+        """checks for a winner
+
+        Returns:
+            bool: winner or not
+        """
         living_players = []
         for player in self.players:
             if player.living: living_players.append(player)
