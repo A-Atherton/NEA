@@ -305,4 +305,10 @@ This worked well and as expected. To expand I am plan to replace the tile when h
 
 I also considered adding wall jumoing to the game. To do this I would need to reset the jump counter when the player hits a wall. The problem with this is if the player is touching a wall and holds the jump key they will fly up the wall. Also to do this I would want only one wall jump. This would mean adding a variable that stores whether the player hjas jumped of a wall since jumping of the floor. Also I would want to only have the player be able to jump if they are directky touching the wall. 
 
+I tried to improve my jumping as currently a player could jump in the air if they fell of a block.
+
+![Alt text](<Screenshot 2023-11-23 at 10.37.14.png>)
+
+I added the print function seen above. This showed that even when touching the ground the player.on_ground was false. I figured that this was because it was within the loop for checking if the player was touching tiles or above them. Since the player could not be touching all of the tiles at least some tiles would not collide and the else would be triggered which would mean that the player would not be able to jump ever. To fix this i set player.on_ground to be false before the for loop then set player.ground to be True if the elif is triggered. This fixed the issue. 
+
 Thinking about unit test. To continue the project I will write unit tests to test that parts all parts of the program function are working every time the project is updated. This will improve the speed of testing as unit test are very fast. 

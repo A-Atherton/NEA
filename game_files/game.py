@@ -74,7 +74,6 @@ class Game():
                     if player.velocity.y < 0:
                         player.rect.top = tile.rect.bottom
                         player.velocity.y = 0
-                        temp+=1
                         
                     elif player.velocity.y > 0:
                         player.rect.bottom = tile.rect.top

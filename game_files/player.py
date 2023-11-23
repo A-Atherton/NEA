@@ -27,6 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_counter = 1
         self.velocity = pygame.Vector2(0,0)
         self.acceleration = pygame.Vector2(0,0)
+        
         #combat
         self.health = 100
         self.holding = None
