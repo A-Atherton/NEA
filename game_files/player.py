@@ -5,6 +5,7 @@ from bullet import Bullet
 class Player(pygame.sprite.Sprite):
     def __init__( self, position, controller_player, game, display_surface, joystick=None ) -> None:
         super().__init__()
+        self.on_ground = False
         self.game_frame_counter = 0
         self.character_frame_counter = 0
         self.facing_left = True
@@ -26,7 +27,6 @@ class Player(pygame.sprite.Sprite):
         self.jump_counter = 1
         self.velocity = pygame.Vector2(0,0)
         self.acceleration = pygame.Vector2(0,0)
-
         #combat
         self.health = 100
         self.holding = None
@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         
         #controller
         if self.controller_player:
-            if self.controller.get_button(0) and self.jump_counter > 0: #A
+            if self.controller.get_button(0) and self.jump_counter > 0 and self.on_ground == True: #A
                 self.jump()
             if self.controller.get_button(1): #B
                 pass
@@ -74,7 +74,7 @@ class Player(pygame.sprite.Sprite):
                 self.acceleration.x = -PLAYER_ACCELERATION_RATE
             else:
                 self.acceleration.x = 0
-            if keys[pygame.K_w] and self.jump_counter > 0: #jump
+            if keys[pygame.K_w] and self.jump_counter > 0 and self.on_ground == True: #jump
                 self.jump()
             if keys[pygame.K_f]: #drop weapon 
                 self.holding = None

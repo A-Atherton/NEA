@@ -68,20 +68,21 @@ class Game():
 
             #verticle check
             player.rect.y += player.velocity.y
+            player.on_ground = False
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(player.rect):
                     if player.velocity.y < 0:
                         player.rect.top = tile.rect.bottom
                         player.velocity.y = 0
+                        temp+=1
                         
                     elif player.velocity.y > 0:
                         player.rect.bottom = tile.rect.top
                         player.jump_counter = 1
                         player.velocity.y = 0
-                        #player.jump_counter = 1
-                else:
-                        pass #player.jump_counter = 0
-
+                        player.on_ground = True
+                        
+            print(player.on_ground)
             #bullet check
             for bullet in self.bullets:
                 if bullet.rect.colliderect(player.rect):
