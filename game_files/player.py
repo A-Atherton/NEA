@@ -8,7 +8,6 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = False
         self.game_frame_counter = 0
         self.character_frame_counter = 0
-        self.facing_left = True
         self.assign_image_arrays()
         self.image = self.idle_image_list[0][0]
         
@@ -21,10 +20,8 @@ class Player(pygame.sprite.Sprite):
         
 
         #movement
-        self.speed = PLAYER_SPEED
-        self.gravity = .8
+        self.gravity = 1.2
         self.jump_speed = -16
-        self.jump_counter = 1
         self.velocity = pygame.Vector2(0,0)
         self.acceleration = pygame.Vector2(0,0)
         
@@ -33,6 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.holding = None
         self.time_of_last_shot = 0 
         self.living = True
+        self.wins = 0
     
     def get_input(self):
         """gets the players input (from either controller or keyboard) and moves the player accordingly
@@ -42,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         
         #controller
         if self.controller_player:
-            if self.controller.get_button(0) and self.jump_counter > 0 and self.on_ground == True: #A
+            if self.controller.get_button(0) and self.on_ground == True: #A
                 self.jump()
             if self.controller.get_button(1): #B
                 pass
@@ -75,7 +73,7 @@ class Player(pygame.sprite.Sprite):
                 self.acceleration.x = -PLAYER_ACCELERATION_RATE
             else:
                 self.acceleration.x = 0
-            if keys[pygame.K_w] and self.jump_counter > 0 and self.on_ground == True: #jump
+            if keys[pygame.K_w] and self.on_ground == True: #jump
                 self.jump()
             if keys[pygame.K_f]: #drop weapon 
                 self.holding = None
@@ -121,7 +119,6 @@ class Player(pygame.sprite.Sprite):
         """makes the player jump
         """
         self.velocity.y = self.jump_speed
-        self.jump_counter -= 1
 
     def update(self):
         """updates the player

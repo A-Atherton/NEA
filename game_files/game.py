@@ -77,11 +77,9 @@ class Game():
                         
                     elif player.velocity.y > 0:
                         player.rect.bottom = tile.rect.top
-                        player.jump_counter = 1
                         player.velocity.y = 0
                         player.on_ground = True
                         
-            print(player.on_ground)
             #bullet check
             for bullet in self.bullets:
                 if bullet.rect.colliderect(player.rect):
@@ -186,12 +184,10 @@ class Game():
         living_players = []
         for player in self.players:
             if player.living: living_players.append(player)
-        print(living_players)
+
         
-        if len(living_players) == 1 and len(self.players) > 1:
-            return True
-        
-        elif len(self.players) == 1 and len(living_players) <= 0:
+        if len(living_players) == 1 and len(self.players) > 1 or len(self.players) == 1 and len(living_players) <= 0:
+            player.wins += 1
             return True
         
         elif len(living_players) == 0:
