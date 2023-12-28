@@ -160,7 +160,7 @@ to investigate further and for later testing i added a key which increases a cou
 
 ![Alt text](<Screen Shot 2023-09-15 at 11.45.20.png>)
 
-this did not work so i printed the layouts that were being passed to the game object on intialization which showed that only one level was being passed to the game object. On inspection of the function to pass the level to the game i noticed that only the wrong variable was being passed and only one level was stored in that variable. This resulted in a broken looking game.
+This did not work so i printed the layouts that were being passed to the game object on intialization which showed that only one level was being passed to the game object. On inspection of the function to pass the level to the game i noticed that only the wrong variable was being passed and only one level was stored in that variable. This resulted in a broken looking game.
 
 ![Alt text](<Screen Shot 2023-09-15 at 11.46.44.png>)
 
