@@ -31,8 +31,12 @@ pygame.init()
 screen = pygame.display.set_mode((1024,576))
 clock = pygame.time.Clock()
 running = True
-pygame.mouse.set_visible(True)
 background = pygame.image.load(os.path.abspath("assets/background/Background.png"))
+
+#pygame settings
+pygame.mouse.set_visible(True) #setting this to false will hide the mouse but this can make gameplay difficult
+
+
 load_levels(screen, clock)
 joysticks = []
 
@@ -54,7 +58,7 @@ while running:
                 print("Joystick connected")
                 game.players.add(Player((100,100), True, joystick=joy))
                 
-    pygame_widgets.update(events)
+
     screen.blit(background, (0,0)) #render background before other components
     game.run()                     #run game components
     pygame.display.flip()          #flip display
