@@ -88,10 +88,10 @@ class Player(pygame.sprite.Sprite):
         if self.health <= 0:
             self.living = False
     
-    def check_if_of_map(self):
+    def check_if_off_map(self):
         """checks if the player is off the map and sets living to false if so
         """
-        if self.rect.y > 1500:
+        if self.rect.y > 700:
             self.health = 0
             self.living = False
     
@@ -105,9 +105,8 @@ class Player(pygame.sprite.Sprite):
         elif self.velocity.x < 0: self.velocity.x -= PLAYER_FRICTION * dt
         if self.velocity.x > PLAYER_MAX_VELOCITY: self.velocity.x = PLAYER_MAX_VELOCITY
         elif self.velocity.x < -PLAYER_MAX_VELOCITY: self.velocity.x = -PLAYER_MAX_VELOCITY
-        print(self.rect.y)
         if abs(self.velocity.x) < 0.5: self.velocity.x = 0
-        print("-----------------")
+        
         
         
     def apply_gravity(self):
