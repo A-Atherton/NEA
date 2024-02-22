@@ -126,7 +126,7 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
         self.move_x_axis()
         self.apply_gravity()
-        self.check_if_of_map()
+        self.check_if_off_map()
         if self.holding != None:
             self.holding.update(pygame.Vector2(self.rect.x, self.rect.y))
             if self.holding.ammo_in_weapon <= 0:
@@ -141,31 +141,24 @@ class Player(pygame.sprite.Sprite):
         if self.controller_player: #controller player
             right_x_offset = self.controller.get_axis(2)
             right_y_offset = self.controller.get_axis(3)
-            
             right_distance = math.sqrt(right_x_offset ** 2 + right_y_offset ** 2)
 
+            left_x_offset = self.controller.get_axis(0)
+            left_y_offset = self.controller.get_axis(1)
+            left_distance = math.sqrt(left_x_offset ** 2 + left_y_offset ** 2)
+            
             if right_distance > 0.1:
                 self.aim_direction = pygame.Vector2(right_x_offset / right_distance, right_y_offset/ right_distance)
-
+            elif left_distance < 0.1:    
+                self.aim_direction = pygame.Vector2(left_x_offset / left_distance, left_y_offset/ left_distance)    
             else:
-                
-                left_x_offset = self.controller.get_axis(0)
-                left_y_offset = self.controller.get_axis(1)
-                left_distance = math.sqrt(left_x_offset ** 2 + left_y_offset ** 2)
+                random_x_offset = (2 * random.random()) - 1
+                random_y_offset = (2 * random.random()) - 1
+                random_distance = math.sqrt(random_x_offset ** 2 + random_y_offset ** 2)
+                self.aim_direction = pygame.Vector2(random_x_offset / random_distance, random_y_offset/ random_distance)
 
-                if left_distance > 0.1:
-                    self.aim_direction = pygame.Vector2(left_x_offset / left_distance, left_y_offset/ left_distance)
-
-                    
-                else:
-                    random_x_offset = (2 * random.random()) - 1
-                    random_y_offset = (2 * random.random()) - 1
-                    
-                    random_distance = math.sqrt(random_x_offset ** 2 + random_y_offset ** 2)
-                    self.aim_direction = pygame.Vector2(random_x_offset / random_distance, random_y_offset/ random_distance)
-
-            aim_cursor_position = (self.rect.x + right_x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 10,
-                                self.rect.y + right_y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER + 16)
+            aim_cursor_position = (self.rect.x + (right_x_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER) + 10,
+                                self.rect.y + (right_y_offset * AIM_INDICATOR_DISTANCE_FROM_PLAYER) + 16)
             pygame.draw.circle(self.display_surface, "white", aim_cursor_position, 4)
             
         else: #keyboard player
@@ -189,7 +182,7 @@ class Player(pygame.sprite.Sprite):
         """creates a bullet that is shot in the direction the player is aiming
 
         Args:
-            bullet_speed (_type_): _description_
+            bullet_speed (float): the speed the bullet should be shot at
         """
         self.game.bullets.add(Bullet((self.rect.x + 10,self.rect.y + 16),
                                           (self.aim_direction.x * bullet_speed, self.aim_direction.y * bullet_speed)))

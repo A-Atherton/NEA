@@ -101,7 +101,8 @@ class Game():
             for tile in self.current_level.tiles.sprites():
                 if tile.rect.colliderect(bullet.rect) and tile.collision == True:
                     bullet.kill()
-                    tile.kill()
+                    tile.damage(1)
+                    
         
     def weapon_collision_check(self, dt) -> None:
         """Checks for collision between weapons and tiles and stops the 

@@ -14,3 +14,9 @@ class Tile(pygame.sprite.Sprite):
         #self.image.blit(tile_image, (0,0))
         self.rect = self.image.get_rect(topleft = position)
         self.collision = collision
+        self.health = 5
+        
+    def damage(self, damage_amount):
+        self.health -= damage_amount
+        if self.health <= 0:
+            self.kill()
