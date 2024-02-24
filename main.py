@@ -1,4 +1,5 @@
 #This is the old version of the game that had all of the code in one python file
+#Now deprecated
 import pygame
 import pygame_widgets
 from pygame_widgets.button import Button

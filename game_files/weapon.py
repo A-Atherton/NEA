@@ -2,6 +2,11 @@ from constants import *
 from dependencies import *
 
 class Weapon(pygame.sprite.Sprite):
+    """structure for holding all of the variables of a weapon
+
+    Args:
+        pygame (_type_): _description_
+    """
     def __init__( self, name: str, shoot: bool, ammo: int, firerate: float, asset_path: str, bullet_speed: int, position:pygame.Vector2) -> None:
         super().__init__()
         position += OFFSET_OF_GUN_FROM_PLAYER
