@@ -6,7 +6,7 @@ def load_levels():
             level_layout = []
             with open(entry, "r") as level:
                 for line in level:
-                    level_layout.append(line.strip("\n"))
+                    level_layout.append(line)
             print(level_layout)
 
 load_levels()
