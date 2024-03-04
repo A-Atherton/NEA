@@ -54,7 +54,7 @@ class Player(pygame.sprite.Sprite):
                 self.acceleration.x = PLAYER_ACCELERATION_RATE * self.controller.get_axis(0)
             
             else:
-                self.velocity.x = 0
+                self.acceleration.x = 0
 
             #shooting 
             if self.controller.get_axis(5) > -0.5 and self.holding != None and self.holding.shoot == True and self.holding.ammo_in_weapon > 0 and time_since_last_shot > self.holding.firerate * 1000:
