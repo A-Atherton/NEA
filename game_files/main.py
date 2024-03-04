@@ -63,5 +63,6 @@ while running:
     game.run()                     #run game components
     pygame.display.flip()          #flip display
     clock.tick(FRAMERATE)
+    print(clock.get_fps(), flush=True)
 
 pygame.quit()
